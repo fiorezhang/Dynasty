@@ -2,7 +2,7 @@ class Map{
 	//生成空白地图
 	constructor(size){
 		this.data = {'cellSize': 0, 'cells': null, 'dayNext':Daycity};
-		this.data.dayNext = Math.ceil(getRandom(1, Daycity*2)/10);
+		this.data.dayNext = Math.round(getRandom(1, Daycity*2)/10);
 		this.data.cellSize = size;
 		this.data.cells = new Array();
 		for (var i=0; i<size; i++){

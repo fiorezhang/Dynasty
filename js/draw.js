@@ -1,14 +1,6 @@
 // -- FUNCTION --
+//加载以及“生成”新地图时调用
 function initNewMap(){
-	/*
-	//清除list里已有元素信息，标记为no alive
-	for (var i=0; i<cityList.length; i++){
-		cityList[i].data.alive = Cityalive.no;
-	}
-	for (var i=0; i<peopleList.length; i++){
-		peopleList[i].data.alive = Peoplealive.no;
-	}	
-	*/
 	//清除list的ID标识并重新生成类
 	City.idStatic = 0;
 	cityList = new Array();
@@ -18,6 +10,7 @@ function initNewMap(){
 	//日期归零
 	globalData.dayMain = 0;
 
+	//根据输入确定地图尺寸
 	globalData.mapCellSize = document.getElementById("size").value;
 
 	//生成地图实例，并初始化湖泊矿产等等
@@ -51,7 +44,7 @@ function initNewMap(){
 	showHighlight();
 }
 
-//绘制整个地图，传进的参数有地图的实例，城市实例list，人口实例list等
+//绘制整个地图，每个单元格按先后顺序，绘制道路，水，资源，城市，人，战争补给动作等。后画的会部分遮挡先画的。
 function drawCells(){
     contextMap.clearRect(0,0,windowSizeMap,windowSizeMap);
 	var cellSide = Math.round(windowSizeMap / globalData.mapCellSize); //边长
@@ -60,24 +53,25 @@ function drawCells(){
         for (var j=0; j<globalData.mapCellSize; j++){
 			//绘制道路（道路在相邻格是重复记录的，画的时候只要画单个格子两个方向就够了，而且边框一圈的格子不会有道路）
 			if (mapMain.data.cells[i][j].roadeast > Rdcount.none){
-				var rgb = Math.ceil(mapMain.data.cells[i][j].roadeast*(16-255)/Rdcount.max + 255);	//根据道路计数器（近期走过的人次）计算出灰度深浅
+				var rgb = Math.floor(mapMain.data.cells[i][j].roadeast*(16-255)/Rdcount.max + 255);	//根据道路计数器（近期走过的人次）计算出灰度深浅
 				contextMap.fillStyle='#'+rgb.toString(16)+rgb.toString(16)+rgb.toString(16);
 				contextMap.fillRect(i*cellSide+cellSide/2+1, j*cellSide+cellSide/2-1, cellSide-2, 2);	//宽度为2的道路
 			}
 			if (mapMain.data.cells[i][j].roadsouth > Rdcount.none){
-				var rgb = Math.ceil(mapMain.data.cells[i][j].roadsouth*(16-255)/Rdcount.max + 255);
+				var rgb = Math.floor(mapMain.data.cells[i][j].roadsouth*(64-255)/Rdcount.max + 255);	//颜色从64到255
 				contextMap.fillStyle='#'+rgb.toString(16)+rgb.toString(16)+rgb.toString(16);
 				contextMap.fillRect(i*cellSide+cellSide/2-1, j*cellSide+cellSide/2+1, 2, cellSide-2);
 			}		
 			//绘制水
 			if (mapMain.data.cells[i][j].terrain == Terrain.water){
-				contextMap.fillStyle="DarkBlue";
+				contextMap.fillStyle="darkslateblue";
 				contextMap.fillRect(i*cellSide, j*cellSide, cellSide, cellSide);
 			}
 			//绘制资源
 			if (mapMain.data.cells[i][j].resource == Resource.food){
-				contextMap.fillStyle="yellow";	//食物，越多方块越大
-				contextMap.fillRect(i*cellSide, j*cellSide, cellSide*mapMain.data.cells[i][j].rescount/Rescount.max, cellSide*mapMain.data.cells[i][j].rescount/Rescount.max);
+				contextMap.fillStyle="wheat";	//食物，越多方块越大
+				var resSide = Math.floor(cellSide*mapMain.data.cells[i][j].rescount/Rescount.max);
+				contextMap.fillRect(i*cellSide+Math.floor((cellSide-resSide)/2), j*cellSide+Math.floor((cellSide-resSide)/2), resSide, resSide);
 			}
 			//绘制城市
 			if (mapMain.data.cells[i][j].citybase == Citybase.zone){
@@ -99,7 +93,7 @@ function drawCells(){
 			    //用中心颜色代表个人，周围代表部族
 				var people = peopleList[mapMain.data.cells[i][j].peopleid];
 				var city = cityList[people.data.cityid];
-				var gradient = contextMap.createRadialGradient(vertexX, vertexY, Math.max(cellSide/8,1), vertexX, vertexY, cellSide/6);	//中心三分之一的个人颜色，到三分之二处是部族颜色
+				var gradient = contextMap.createRadialGradient(vertexX, vertexY, Math.max(cellSide/8,1), vertexX, vertexY, cellSide/6);	//中心四分之一的个人颜色，到三分之一处是部族颜色
 				gradient.addColorStop(0, getSeededRandomColor(16,255, people.data.id));
 				gradient.addColorStop(1, getSeededRandomColor(16,255,city.data.id));
 				contextMap.fillStyle = gradient;
@@ -252,7 +246,7 @@ function showTable() {
 		tab+="<td>" + people.data.familyName + people.data.givenName + "</td>";																//村民
 		tab+="<td>" + people.data.age + "</td>";																							//寿命
 		if (people.data.combatcount > 0){																									//胜率
-			tab+="<td>" + Math.ceil(100*people.data.combatcountwin/people.data.combatcount) + "</td>";
+			tab+="<td>" + Math.floor(100*people.data.combatcountwin/people.data.combatcount) + "</td>";
 		}
 		else {
 			tab+="<td>-</td>";
@@ -272,7 +266,7 @@ function showTable() {
 			tab+="<td>" + people.data.familyName + people.data.givenName + "</td>";																//村民
 			tab+="<td>" + people.data.age + "</td>";																							//寿命
 			if (people.data.combatcount > 0){																									//胜率
-				tab+="<td>" + Math.ceil(100*people.data.combatcountwin/people.data.combatcount) + "</td>";
+				tab+="<td>" + Math.floor(100*people.data.combatcountwin/people.data.combatcount) + "</td>";
 			}
 			else {
 				tab+="<td>-</td>";
@@ -296,7 +290,7 @@ function showTable() {
 				tab+="<td>" + people.data.familyName + people.data.givenName + "</td>";																//村民
 				tab+="<td>" + people.data.age + "</td>";																							//寿命
 				if (people.data.combatcount > 0){																									//胜率
-					tab+="<td>" + Math.ceil(100*people.data.combatcountwin/people.data.combatcount) + "</td>";
+					tab+="<td>" + Math.floor(100*people.data.combatcountwin/people.data.combatcount) + "</td>";
 				}
 				else {
 					tab+="<td>-</td>";
@@ -350,7 +344,7 @@ function updateAll(){
 		}
 	}
 	if (globalData.peopleAlive > 0) {
-		globalData.ageAverage = Math.ceil(ageSum / globalData.peopleAlive);
+		globalData.ageAverage = Math.floor(ageSum / globalData.peopleAlive);
 	}
 	
 }

@@ -1,29 +1,29 @@
 #console1 {
-	width:890px;
+	width:930px;
 	height:40px;
-	background-color:white;
-	padding: 10px 30px;
+	background-color:#EEEEEE;
+	padding: 10px 10px;
 	margin: 0px 10px;
 	box-shadow: 10px 10px 5px #888888;
 }
 #console2 {
-	width:240px;
+	width:260px;
 	height:225px;
-	background-color:white;
-	padding: 10px 30px;
+	background-color:#EEEEEE;
+	padding: 10px 10px;
 	margin: 20px 10px;
 	box-shadow: 10px 10px 5px #888888;
 }
 #console2_wrap {
-	width:310px;
+	width:290px;
 	height:1060px;
-	background-color:white;
+	background-color:#EEEEEE;
 	margin: 20px 10px;
 }
 #console3 {
-	width:560px;
+	width:580px;
 	height:1040px;
-	background-color:white;
+	background-color:#EEEEEE;
 	padding: 10px 30px;
 	margin: 20px 10px;
 	box-shadow: 10px 10px 5px #888888;

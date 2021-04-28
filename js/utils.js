@@ -33,7 +33,7 @@ var Dayroad = 1;
 var Daypeople = 100;
 var Daycity = 1000;
 
-var CityNumMax = 10;
+var CityNumMax = 12;
 var PeopleNumIndex = 8;
 
 var MapWaterSeed = 0.43;
@@ -73,7 +73,7 @@ function getSeededRandom(m, n, seed){
     var temp = (seed * 9301 + 49297) % 233280;
     var rnd = temp / 233280.0;
  
-    return Math.ceil( min + rnd * (max - min) );   // Math.ceil实现取整功能，可以根据需要取消取整
+    return Math.round( min + rnd * (max - min) );   // Math.round实现取整功能，可以根据需要取消取整
  };
 
 function getRandomColor(m, n){
