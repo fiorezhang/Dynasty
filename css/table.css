@@ -1,0 +1,6 @@
+table{margin:20px auto;} 
+td{width:100px;height:24px;text-align:center;line-height:24px;border:1px solid silver;} 
+.top{background:#CCCCCC;cursor:pointer;font-weight:bold} 
+.up{background:#CCFFCC;} 
+.down{background:#FFCCCC;} 
+.hov{background:#EEEEEE;} 

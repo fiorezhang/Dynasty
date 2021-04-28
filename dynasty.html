@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<meta charset="utf-8"> 
+<title>[PlayGround - FZ] Dynasty</title> 
+<link rel="stylesheet" type="text/css" href="./css/map.css">
+<link rel="stylesheet" type="text/css" href="./css/status.css">
+<link rel="stylesheet" type="text/css" href="./css/table.css">
+</head>
+
+<body>
+<div id=map style="float:left;">
+<canvas id="canavasMap" width="100" height="100" style="border:1px solid #d3d3d3;">
+您的浏览器不支持 HTML5 canvas 标签。</canvas><br/>
+</div>
+
+<div style="float:left;">
+<div id=console1>
+<b style="width:150px; height:50px; font-size:20px;">速度</b>
+<input type="text" id="speed" value="0.1" style="width:200px; height:40px; font-size:20px"></input>
+<b style="width:150px; height:50px; font-size:20px;">尺寸</b>
+<input type="text" id="size" value="100" style="width:200px; height:40px; font-size:20px"></input>
+<b style="width:150px; height:50px; font-size:20px;">调试</b>
+<input type="text" id="debug" value="0" style="width:200px; height:40px; font-size:20px"></input>
+</div>
+
+<div id=console1>
+<button class="button" onclick="initNewMap()">生成</button>
+<button class="button" onclick="save()">存档</button>
+<button class="button" onclick="load()">读档</button>
+<button class="button" onclick="autoCa()">自动</button>
+<button class="button" onclick="stepCa()">继续</button>
+</div>
+
+<div id=console2_wrap style="float:left;">
+<div id=console2>
+<b id="day" style="width:150px; height:50px; font-size:20px;">天数</b><br>
+<b id="peoplecnt" style="width:150px; height:50px; font-size:20px;">人数</b><br>
+<b id="citycnt" style="width:150px; height:50px; font-size:20px;">城数</b><br>
+<b id="foodcnt" style="width:150px; height:50px; font-size:20px;">野矿</b><br>
+<b id="combat" style="width:150px; height:50px; font-size:20px;">战争</b><br>
+<b id="ageavg" style="width:150px; height:50px; font-size:20px;">均寿</b><br>
+</div>
+<div  id=console2>
+<b id="coord" style="width:150px; height:50px; font-size:20px;">坐标</b><br>
+<b id="food" style="width:150px; height:50px; font-size:20px;">矿藏</b><br>
+</div>
+<div  id=console2>
+<b id="cityname" style="width:150px; height:50px; font-size:20px;">城市</b><br>
+<b id="citizen" style="width:150px; height:50px; font-size:20px;">人口</b><br>
+<b id="store" style="width:150px; height:50px; font-size:20px;">储备</b><br>
+</div>
+<div  id=console2>
+<b id="peoplename" style="width:150px; height:50px; font-size:20px;">村民</b><br>
+<b id="age" style="width:150px; height:50px; font-size:20px;">寿命</b><br>
+<b id="carry" style="width:150px; height:50px; font-size:20px;">携带</b><br>
+<b id="battle" style="width:150px; height:50px; font-size:20px;">战斗</b><br>
+<b id="revenue" style="width:150px; height:50px; font-size:20px;">收益</b><br>
+<b id="power" style="width:150px; height:50px; font-size:20px;">战力</b><br>
+<b id="collect" style="width:150px; height:50px; font-size:20px;">采集</b></b><br>
+<b id="recycle" style="width:150px; height:50px; font-size:20px;">回收</b></b><br>
+</div>
+</div>
+
+<div id=console3 style="float:left;">
+<table id="table"> 
+</table> 
+</div>
+
+<script type="text/javascript" src="./js/utils.js"></script>
+<script type="text/javascript" src="./js/map.js"></script>
+<script type="text/javascript" src="./js/city.js"></script>
+<script type="text/javascript" src="./js/people.js"></script>
+<script type="text/javascript" src="./js/tablesort.js"></script>
+<script type="text/javascript" src="./js/draw.js"></script>
+
+<script>
+// -- MAIN --
+//控制台信息
+var globalData = {	'consoleLog':0,
+					'secondCycle':1, 
+					'dayMain':0,	//记录回合数（天数），地图资源等按照一定天数间隔刷新，人物按照天数为最小单位来决定行动（更新状态机）
+					'cityAlive':0, 
+					'peopleAlive':0, 
+					'combatMain':0, //战争计数器
+					'mapCellSize':10, 	//地图尺寸，N x N的方格地图
+					'cityNum':4, 	//初始生成多少个城市
+					'peopleNumCity':0,	//每个城市初始生成多少个人
+					'ageAverage':0,	//平均寿命
+					'foodCount':0, 	//野外总矿数
+					'highlightPosX':0, //鼠标焦点
+					'highlightPosY':0, 
+					'highlightPeopleId':Peopleid.none,
+					'highlightCityId':Cityid.none,
+					'excel':null,
+				};
+
+//调试接口
+globalData.consoleLog = document.getElementById("debug").value;
+
+//单步循环间隔
+globalData.secondCycle = document.getElementById("speed").value;
+
+//根据自定义内容重绘画布
+var windowSizeMap = 1200;
+var canavasMap = document.getElementById("canavasMap");
+canavasMap.width = windowSizeMap.toString();
+canavasMap.height= windowSizeMap.toString();
+var contextMap = canavasMap.getContext("2d");	//全局绘图句柄
+var timer;	//用在自动回合中，每回合间隔时间
+
+//生成Map的实例
+globalData.mapCellSize = document.getElementById("size").value;	//地图尺寸，N x N的方格地图
+var mapMain;	//唯一的地图实例
+
+//生成City的实例
+var cityList = new Array(); //切记，维护唯一的list，因为list的index和其中元素的id一一对应
+
+//生成People的实例
+var peopleList = new Array();
+
+//初始化地图，城市，人口等等
+initNewMap();
+
+//单步更新所有游戏元素的状态，包括地图，城市，人口等等
+function stepCa(){
+	globalData.consoleLog = document.getElementById("debug").value;
+	globalData.secondCycle = document.getElementById("speed").value;
+	
+	if (globalData.secondCycle <= 0){
+		globalData.secondCycle = 1;
+	}
+
+	//打印所有信息，可以关掉
+	if (globalData.consoleLog == 1){
+		console.log(mapMain);
+		console.log(cityList);
+		console.log(peopleList);
+	}
+		
+	updateAll();	//更新状态
+	showStatus();	//显示状态
+	showTable();	//显示表格
+    drawCells();	//画格子
+	showHighlight();//高亮
+	globalData.dayMain += 1;	//天数+1
+}
+
+//循环调用单步更新状态的函数
+function autoCa(){
+    if (timer == undefined){
+        timer = setInterval(function(){ stepCa() }, globalData.secondCycle * 1000);
+    }
+    else{
+        clearInterval(timer);
+        timer = undefined;
+    }
+}
+
+//响应鼠标事件的函数，例如点击后显示当前格的有用信息等
+canavasMap.onmousedown = function(ev) {
+	var ev = ev || window.event;
+	
+	var rect = canavasMap.getBoundingClientRect();
+    var offsetX = ev.clientX - rect.left * (canavasMap.width / rect.width);
+	var offsetY = ev.clientY - rect.top * (canavasMap.height / rect.height);
+
+	
+	
+	//var offsetX = ev.clientX-canavasMap.offsetLeft;
+	//var offsetY = ev.clientY-canavasMap.offsetTop;
+	var cellSide = Math.round(windowSizeMap / globalData.mapCellSize);
+	var posX = Math.floor(offsetX / cellSide);
+	var posY = Math.floor(offsetY / cellSide);
+	contextMap.moveTo(offsetX,offsetY);
+	
+	//探测到当前鼠标点下的posX,posY
+	globalData.highlightPosX = posX;
+	globalData.highlightPosY = posY;
+	globalData.highlightPeopleId = mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].peopleid;
+	globalData.highlightCityId = mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].cityid;
+
+	showStatus();
+	showTable();
+	drawCells();
+	
+	canavasMap.onmouseup = function(){
+		document.onmouseup = null;
+	};
+};
+</script>
+
+</body>
+</html>
