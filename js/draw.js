@@ -70,7 +70,7 @@ function drawCells(){
 			//绘制资源
 			if (mapMain.data.cells[i][j].resource == Resource.food){
 				contextMap.fillStyle="wheat";	//食物，越多方块越大
-				var resSide = Math.floor(cellSide*mapMain.data.cells[i][j].rescount/Rescount.max);
+				var resSide = Math.ceil(cellSide*mapMain.data.cells[i][j].rescount/Rescount.max);
 				contextMap.fillRect(i*cellSide+Math.floor((cellSide-resSide)/2), j*cellSide+Math.floor((cellSide-resSide)/2), resSide, resSide);
 			}
 			//绘制城市
@@ -101,6 +101,24 @@ function drawCells(){
 				contextMap.arc(vertexX, vertexY, cellSide/2-1, 0, 2*Math.PI);
 				contextMap.fill();
 			}			
+			//绘制文化
+			if (mapMain.data.cells[i][j].cityculture != Cityid.none){
+				var city = cityList[mapMain.data.cells[i][j].cityculture];
+				contextMap.fillStyle=getSeededRandomColor(16,255,city.data.id);
+				//contextMap.fillRect(i*cellSide+cellSide/2-1, j*cellSide+cellSide/2-1, 2, 2);
+				if (i>=1 && mapMain.data.cells[i][j].cityculture != mapMain.data.cells[i-1][j].cityculture){
+					contextMap.fillRect(i*cellSide, (j+1/4)*cellSide, 1, cellSide/2);
+				}
+				if (i<globalData.mapCellSize-1 && mapMain.data.cells[i][j].cityculture != mapMain.data.cells[i+1][j].cityculture){
+					contextMap.fillRect((i+1)*cellSide-1, (j+1/4)*cellSide, 1, cellSide/2);
+				}
+				if (j>=1 && mapMain.data.cells[i][j].cityculture != mapMain.data.cells[i][j-1].cityculture){
+					contextMap.fillRect((i+1/4)*cellSide, j*cellSide, cellSide/2, 1);
+				}
+				if (j<globalData.mapCellSize-1 && mapMain.data.cells[i][j].cityculture != mapMain.data.cells[i][j+1].cityculture){
+					contextMap.fillRect((i+1/4)*cellSide, (j+1)*cellSide-1, cellSide/2, 1);
+				}				
+			}						
 			//绘制战争和补给
 			if (mapMain.data.cells[i][j].peopleid != Peopleid.none){
 				var people = peopleList[mapMain.data.cells[i][j].peopleid];
@@ -154,14 +172,23 @@ function showHighlight() {
 	else if (cityList.length > 0 && globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
 		posX = globalData.highlightPosX;
 		posY = globalData.highlightPosY;
-		for (var i=0; i<cityList[globalData.highlightCityId].data.peopleidlist.length; i++) {
-			posPeopleX = peopleList[cityList[globalData.highlightCityId].data.peopleidlist[i]].data.posX;
-			posPeopleY = peopleList[cityList[globalData.highlightCityId].data.peopleidlist[i]].data.posY;
+		var city = cityList[globalData.highlightCityId];
+		for (var i=0; i<city.data.peopleidlist.length; i++) {
+			posPeopleX = peopleList[city.data.peopleidlist[i]].data.posX;
+			posPeopleY = peopleList[city.data.peopleidlist[i]].data.posY;
 			contextMap.fillStyle="orange";
 			contextMap.fillRect(posPeopleX*cellSide, posPeopleY*cellSide, cellSide, 1);
 			contextMap.fillRect(posPeopleX*cellSide, posPeopleY*cellSide, 1, cellSide);	
 			contextMap.fillRect(posPeopleX*cellSide, (posPeopleY+1)*cellSide-1, cellSide, 1);
 			contextMap.fillRect((posPeopleX+1)*cellSide-1, posPeopleY*cellSide, 1, cellSide);	
+		}
+		contextMap.fillStyle=getSeededRandomColor(16,255,city.data.id);
+		for (var i=0; i<globalData.mapCellSize; i++){
+			for (var j=0; j<globalData.mapCellSize; j++){
+				if (mapMain.data.cells[i][j].cityculture == city.data.id) {
+					contextMap.fillRect(i*cellSide+cellSide/2-1, j*cellSide+cellSide/2-1, 2, 2);
+				}
+			}
 		}
 	}
 	else{
@@ -190,6 +217,7 @@ function showStatus() {
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("store").innerHTML = "储备";
 		document.getElementById("citizen").innerHTML = "人口";
+		document.getElementById("territory").innerHTML = "疆域";
 		document.getElementById("peoplename").innerHTML = "村民： " + peopleList[globalData.highlightPeopleId].data.familyName + peopleList[globalData.highlightPeopleId].data.givenName;
 		document.getElementById("carry").innerHTML = "携带： " + peopleList[globalData.highlightPeopleId].data.resource + " (" + peopleList[globalData.highlightPeopleId].data.starve + ")";
 		document.getElementById("power").innerHTML = "战力： " + peopleList[globalData.highlightPeopleId].data.power + " (" + peopleList[globalData.highlightPeopleId].data.rescombat + ")";
@@ -205,6 +233,7 @@ function showStatus() {
 		document.getElementById("cityname").innerHTML = "城市： " + cityList[globalData.highlightCityId].data.familyName;
 		document.getElementById("store").innerHTML = "储备： " + cityList[globalData.highlightCityId].data.resource;
 		document.getElementById("citizen").innerHTML = "人口： " + cityList[globalData.highlightCityId].data.peopleidlist.length;
+		document.getElementById("territory").innerHTML = "疆域： " + cityList[globalData.highlightCityId].data.territory;
 		document.getElementById("peoplename").innerHTML = "村民";
 		document.getElementById("carry").innerHTML = "携带";
 		document.getElementById("power").innerHTML = "战力";
@@ -220,6 +249,7 @@ function showStatus() {
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("store").innerHTML = "储备";
 		document.getElementById("citizen").innerHTML = "人口";
+		document.getElementById("territory").innerHTML = "疆域";
 		document.getElementById("peoplename").innerHTML = "村民";
 		document.getElementById("carry").innerHTML = "携带";
 		document.getElementById("power").innerHTML = "战力";

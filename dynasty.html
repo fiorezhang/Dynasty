@@ -49,6 +49,7 @@
 <b id="cityname" style="width:150px; height:50px; font-size:20px;">城市</b><br>
 <b id="citizen" style="width:150px; height:50px; font-size:20px;">人口</b><br>
 <b id="store" style="width:150px; height:50px; font-size:20px;">储备</b><br>
+<b id="territory" style="width:150px; height:50px; font-size:20px;">疆域</b><br>
 </div>
 <div  id=console2>
 <b id="peoplename" style="width:150px; height:50px; font-size:20px;">村民</b><br>
@@ -80,7 +81,7 @@
 var Terrain = {'none':0, 'water':1};
 
 var Resource = {'none':0, 'food':1};
-var Rescount = {'none':0, 'reborn':1, 'max':30};
+var Rescount = {'none':0, 'reborn':1, 'max':20};
 
 var Cityalive = {'no':0, 'yes':1};
 var Citybase = {'none':0, 'reserve':1, 'zone':2, 'center':3};
@@ -90,10 +91,10 @@ var Cityresource = {'none':0, 'small':10000, 'middle':30000, 'big':90000};
 
 var Peoplealive = {'no':0, 'yes':1};
 var Peopleid = {'none':-1};
-var Peopleresource = {'none':0, 'dying':200, 'starve':400, 'standard':1000, 'enough':1800, 'max':2000};
+var Peopleresource = {'none':0, 'dying':200, 'starve':500, 'standard':1000, 'enough':1800, 'max':2000};
 var Peoplecollect = {'none':0, 'max':10};
 var Peoplerecycle = {'none':0, 'max':10};
-var Peopleconsume = {'none':0, 'max':10};
+var Peopleconsume = {'none':0, 'save':5, 'max':10};
 var Peoplestarve = {'no':0, 'yes':1};
 
 var Peoplepower = {'none':0, 'max':10};
@@ -110,8 +111,9 @@ var Dayfoodreborn = 2;
 var Dayroad = 1;
 var Daypeople = 100;
 var Daycity = 1000;
+var Dayculture = 1;
 
-var CityNumMax = 15;
+var CityNumMax = 20;
 var PeopleNumIndex = 10;
 
 var MapWaterSeed = 0.41;
@@ -229,6 +231,7 @@ canavasMap.onmousedown = function(ev) {
 	showStatus();
 	showTable();
 	drawCells();
+	showHighlight();
 	
 	canavasMap.onmouseup = function(){
 		document.onmouseup = null;

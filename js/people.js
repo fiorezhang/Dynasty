@@ -214,6 +214,12 @@ class People{
 		//var resConsume = Math.min(this.data.consume, this.data.resource);
 		//仅当不在矿区的时候消耗食物，并且立刻回收一部分食物（不占用行动）
 		if (mapMain.data.cells[this.data.posX][this.data.posY].resource != Resource.food) {
+			if (mapMain.data.cells[this.data.posX][this.data.posY].cityculture == this.data.cityid) {	//在自己的疆域上
+				this.data.consume = Math.max(Peopleconsume.save, this.data.recycle);
+			}
+			else {
+				this.data.consume = Peopleconsume.max;
+			}
 			this.data.resource -= this.data.consume;
 			this.data.resconsume -= this.data.consume;
 			this.data.resource += this.data.recycle;

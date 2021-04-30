@@ -2,7 +2,7 @@ class City{
 	static idStatic = 0;
 	
 	constructor(size){
-		this.data = {'posX':0, 'posY':0, 'alive':Cityalive.no, 'resource':0, 'dayNext':Daypeople, 'citySize':0, 'id':Cityid.none, 'familyName':'', 'peopleidlist':null, 'rescelllist':null};
+		this.data = {'posX':0, 'posY':0, 'alive':Cityalive.no, 'resource':0, 'dayNext':Daypeople, 'citySize':0, 'id':Cityid.none, 'familyName':'', 'territory':0, 'peopleidlist':null, 'rescelllist':null};
 		
 		if (size == Citysize.none){	//专门设计给读档
 			City.idStatic += 1;
@@ -61,6 +61,7 @@ class City{
 			for (var j=-this.data.citySize; j<=this.data.citySize; j++){
 				mapMain.data.cells[this.data.posX+i][this.data.posY+j].citybase = Citybase.zone;
 				mapMain.data.cells[this.data.posX+i][this.data.posY+j].cityid = this.data.id;
+				mapMain.data.cells[this.data.posX+i][this.data.posY+j].cityculture = this.data.id;
 			}
 		}
 		mapMain.data.cells[this.data.posX][this.data.posY].citybase = Citybase.center;
@@ -95,6 +96,16 @@ class City{
 			}	
 		}
 		
+		//计算城市文化疆域
+		this.data.territory = 0;
+		for (var i=0; i<globalData.mapCellSize; i++){
+			for (var j=0; j<globalData.mapCellSize; j++){
+				if (mapMain.data.cells[i][j].cityculture == this.data.id) {
+					this.data.territory += 1;
+				}
+			}
+		}
+		
 		//升级城市
 		var citySizeChange = 0;
 		if (this.data.citySize == Citysize.small && this.data.resource > Cityresource.middle) {
@@ -123,6 +134,7 @@ class City{
 				for (var j=-this.data.citySize; j<=this.data.citySize; j++){
 					mapMain.data.cells[this.data.posX+i][this.data.posY+j].citybase = Citybase.zone;
 					mapMain.data.cells[this.data.posX+i][this.data.posY+j].cityid = this.data.id;
+					mapMain.data.cells[this.data.posX+i][this.data.posY+j].cityculture = this.data.id;
 				}
 			}
 			mapMain.data.cells[this.data.posX][this.data.posY].citybase = Citybase.center;

@@ -8,7 +8,7 @@ class Map{
 		for (var i=0; i<size; i++){
 			this.data.cells[i] = new Array();
 			for (var j=0; j<size; j++){
-				this.data.cells[i][j] = {'terrain':Terrain.none, 'resource':Resource.none, 'rescount':Rescount.none, 'citybase':Citybase.none, 'cityid':Cityid.none, 'peopleid':Peopleid.none, 'roadwest':Rdcount.none, 'roadeast':Rdcount.none, 'roadnorth':Rdcount.none, 'roadsouth':Rdcount.none};
+				this.data.cells[i][j] = {'terrain':Terrain.none, 'resource':Resource.none, 'rescount':Rescount.none, 'citybase':Citybase.none, 'cityculture':Cityid.none, 'cityid':Cityid.none, 'peopleid':Peopleid.none, 'roadwest':Rdcount.none, 'roadeast':Rdcount.none, 'roadnorth':Rdcount.none, 'roadsouth':Rdcount.none};
 			}
 		}
 	}
@@ -144,13 +144,33 @@ class Map{
 		//更新道路
 		if (day % Dayroad == 0){	//每隔一段时间就把道路的计数器减一
 			for (var i=1; i<size-1; i++){
-				for (var j=0; j<size-1; j++){
+				for (var j=1; j<size-1; j++){
 					this.data.cells[i][j].roadwest = decrease(this.data.cells[i][j].roadwest, Rdcount.decrease, Rdcount.none, Rdcount.max);
 					this.data.cells[i][j].roadeast = decrease(this.data.cells[i][j].roadeast, Rdcount.decrease, Rdcount.none, Rdcount.max);
 					this.data.cells[i][j].roadnorth = decrease(this.data.cells[i][j].roadnorth, Rdcount.decrease, Rdcount.none, Rdcount.max);
 					this.data.cells[i][j].roadsouth = decrease(this.data.cells[i][j].roadsouth, Rdcount.decrease, Rdcount.none, Rdcount.max);
 				}
 			}
+		}
+		//更新文化
+		if (day % Dayculture == 0){
+			for (var i=1; i<size-1; i++){
+				for (var j=0; j<size-1; j++){
+					if (this.data.cells[i][j].peopleid != Peopleid.none && this.data.cells[i][j].resource == Resource.none) {	//如果有人经过空地
+						var people = peopleList[this.data.cells[i][j].peopleid];
+						var city = cityList[people.data.cityid];
+						var sum = 0;
+						for (var k=Math.max(0, i-1); k<Math.min(size, i+2); k++){
+							for (var l=Math.max(0, j-1); l<Math.min(size, j+2); l++){
+								sum += this.data.cells[k][l].cityculture==city.data.id?1:0;
+							}
+						}
+						if (sum >= 3){
+							this.data.cells[i][j].cityculture = city.data.id;
+						}
+					}
+				}
+			}			
 		}
 		//生成新城市
 		var cityCount = 0; 
