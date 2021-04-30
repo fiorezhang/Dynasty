@@ -259,7 +259,7 @@ function showTable() {
 		//----
 	}
 	else if (globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
-		for (var i=0; i<cityList[globalData.highlightCityId].data.peopleidlist.length; i++) {
+		for (var i=0; i<Math.min(cityList[globalData.highlightCityId].data.peopleidlist.length, TableRowMax); i++) {
 			var people = peopleList[cityList[globalData.highlightCityId].data.peopleidlist[i]];
 			//----
 			tab+="<tr>"
@@ -280,7 +280,7 @@ function showTable() {
 		}
 	}
 	else {
-		var showMax = 32;	//最多显示多少行
+		var showMax = TableRowMax;	//最多显示多少行
 		for (var i=0; i<peopleList.length && showMax>0; i++) {	
 			if (peopleList[i].data.alive == Peoplealive.yes) {
 				showMax -= 1;

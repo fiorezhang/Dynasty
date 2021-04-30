@@ -13,7 +13,8 @@ class City{
 		var countRetry = 0;		
 		var maxRetry = 1000;
 		var cityConflict = 0;
-		var cityBoundary = Citysize.big + 1;
+		//var cityBoundary = Citysize.big + 1;
+		var cityBoundary = Citysize.big;
 		do{
 			cityConflict = 0;
 			this.data.posX = getRandom(0+cityBoundary, mapMain.data.cellSize-cityBoundary);

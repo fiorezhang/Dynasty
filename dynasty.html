@@ -19,7 +19,7 @@
 <b style="width:150px; height:50px; font-size:20px;">速度</b>
 <input type="text" id="speed" value="0.1" style="width:200px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">尺寸</b>
-<input type="text" id="size" value="100" style="width:200px; height:40px; font-size:20px"></input>
+<input type="text" id="size" value="120" style="width:200px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">调试</b>
 <input type="text" id="debug" value="0" style="width:200px; height:40px; font-size:20px"></input>
 </div>
@@ -76,7 +76,53 @@
 
 <script>
 // -- MAIN --
-//控制台信息
+//常量变量定义+
+var Terrain = {'none':0, 'water':1};
+
+var Resource = {'none':0, 'food':1};
+var Rescount = {'none':0, 'reborn':1, 'max':30};
+
+var Cityalive = {'no':0, 'yes':1};
+var Citybase = {'none':0, 'reserve':1, 'zone':2, 'center':3};
+var Cityid = {'none':-1}; 
+var Citysize = {'none':0, 'small':1, 'middle':2, 'big':3};
+var Cityresource = {'none':0, 'small':10000, 'middle':30000, 'big':90000};
+
+var Peoplealive = {'no':0, 'yes':1};
+var Peopleid = {'none':-1};
+var Peopleresource = {'none':0, 'dying':200, 'starve':400, 'standard':1000, 'enough':1800, 'max':2000};
+var Peoplecollect = {'none':0, 'max':10};
+var Peoplerecycle = {'none':0, 'max':10};
+var Peopleconsume = {'none':0, 'max':10};
+var Peoplestarve = {'no':0, 'yes':1};
+
+var Peoplepower = {'none':0, 'max':10};
+
+var Peopleage = {'none':0, 'max':10000};
+
+var Direct = {'none':0, 'west':1, 'east':2, 'north':3, 'south':4};
+
+var Rdcount = {'none':0, 'decrease':1, 'increase':10, 'max':20};
+
+var Combatwin = {'no':0, 'yes':1};
+
+var Dayfoodreborn = 2;
+var Dayroad = 1;
+var Daypeople = 100;
+var Daycity = 1000;
+
+var CityNumMax = 15;
+var PeopleNumIndex = 10;
+
+var MapWaterSeed = 0.41;
+var MapWaterLoop = 15;
+var MapResourceSeed = 0.45;
+var MapResourceLoop = 10;
+
+var TableRowMax = 30;
+//常量变量定义-
+
+//全局变量，存档时需要保存
 var globalData = {	'consoleLog':0,
 					'secondCycle':1, 
 					'dayMain':0,	//记录回合数（天数），地图资源等按照一定天数间隔刷新，人物按照天数为最小单位来决定行动（更新状态机）
@@ -84,7 +130,7 @@ var globalData = {	'consoleLog':0,
 					'peopleAlive':0, 
 					'combatMain':0, //战争计数器
 					'mapCellSize':10, 	//地图尺寸，N x N的方格地图
-					'cityNum':4, 	//初始生成多少个城市
+					'cityNum':10, 	//初始生成多少个城市
 					'peopleNumCity':0,	//每个城市初始生成多少个人
 					'ageAverage':0,	//平均寿命
 					'foodCount':0, 	//野外总矿数
@@ -92,8 +138,8 @@ var globalData = {	'consoleLog':0,
 					'highlightPosY':0, 
 					'highlightPeopleId':Peopleid.none,
 					'highlightCityId':Cityid.none,
-					'excel':null,
-				};
+					'excel':null,	//绘制表格时的句柄，每次新建实例前要销毁前一个实例
+				};			
 
 //调试接口
 globalData.consoleLog = document.getElementById("debug").value;

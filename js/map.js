@@ -128,6 +128,7 @@ class Map{
 		this.initRescount();
 	}
 	
+	//每日更新
 	update(day){
 		var size = this.data.cellSize;
 		//更新资源
