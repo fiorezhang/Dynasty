@@ -32,7 +32,7 @@
 <button class="button" onclick="stepCa()">继续</button>
 </div>
 
-<div id=console2_wrap style="float:left;">
+<div style="float:left;">
 <div id=console2>
 <b id="day" style="width:150px; height:50px; font-size:20px;">天数</b><br>
 <b id="peoplecnt" style="width:150px; height:50px; font-size:20px;">人数</b><br>
@@ -44,9 +44,11 @@
 <div  id=console2>
 <b id="coord" style="width:150px; height:50px; font-size:20px;">坐标</b><br>
 <b id="food" style="width:150px; height:50px; font-size:20px;">矿藏</b><br>
+<b id="culture" style="width:150px; height:50px; font-size:20px;">文化</b><br>
 </div>
 <div  id=console2>
 <b id="cityname" style="width:150px; height:50px; font-size:20px;">城市</b><br>
+<b id="citylevel" style="width:150px; height:50px; font-size:20px;">等级</b><br>
 <b id="citizen" style="width:150px; height:50px; font-size:20px;">人口</b><br>
 <b id="store" style="width:150px; height:50px; font-size:20px;">储备</b><br>
 <b id="territory" style="width:150px; height:50px; font-size:20px;">疆域</b><br>
@@ -63,9 +65,15 @@
 </div>
 </div>
 
-<div id=console3 style="float:left;">
-<table id="table"> 
+<div style="float:left;">
+<div id=console3 >
+<table id="table_city"> 
 </table> 
+</div>
+<div id=console3>
+<table id="table_people"> 
+</table> 
+</div>
 </div>
 
 <script type="text/javascript" src="./js/utils.js"></script>
@@ -91,7 +99,7 @@ var Cityresource = {'none':0, 'small':10000, 'middle':30000, 'big':90000};
 
 var Peoplealive = {'no':0, 'yes':1};
 var Peopleid = {'none':-1};
-var Peopleresource = {'none':0, 'dying':200, 'starve':500, 'standard':1000, 'enough':1800, 'max':2000};
+var Peopleresource = {'none':0, 'dying':100, 'starve':500, 'standard':1000, 'enough':1800, 'max':2000};
 var Peoplecollect = {'none':0, 'max':10};
 var Peoplerecycle = {'none':0, 'max':10};
 var Peopleconsume = {'none':0, 'save':5, 'max':10};
@@ -121,7 +129,7 @@ var MapWaterLoop = 15;
 var MapResourceSeed = 0.45;
 var MapResourceLoop = 10;
 
-var TableRowMax = 30;
+var TableRowMax = 15;
 //常量变量定义-
 
 //全局变量，存档时需要保存
@@ -140,7 +148,8 @@ var globalData = {	'consoleLog':0,
 					'highlightPosY':0, 
 					'highlightPeopleId':Peopleid.none,
 					'highlightCityId':Cityid.none,
-					'excel':null,	//绘制表格时的句柄，每次新建实例前要销毁前一个实例
+					'excel_city':null,	//绘制表格时的句柄，每次新建实例前要销毁前一个实例
+					'excel_people':null,
 				};			
 
 //调试接口

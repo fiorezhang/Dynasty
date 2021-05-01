@@ -214,10 +214,12 @@ function showStatus() {
 	if (globalData.highlightPeopleId != Peopleid.none){
 		document.getElementById("coord").innerHTML = "坐标： " + peopleList[globalData.highlightPeopleId].data.posX + " , " + peopleList[globalData.highlightPeopleId].data.posY;
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[peopleList[globalData.highlightPeopleId].data.posX][peopleList[globalData.highlightPeopleId].data.posY].rescount;	
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[peopleList[globalData.highlightPeopleId].data.posX][peopleList[globalData.highlightPeopleId].data.posY].cityculture != Cityid.none?cityList[mapMain.data.cells[peopleList[globalData.highlightPeopleId].data.posX][peopleList[globalData.highlightPeopleId].data.posY].cityculture].data.familyName:"-");	
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("store").innerHTML = "储备";
 		document.getElementById("citizen").innerHTML = "人口";
 		document.getElementById("territory").innerHTML = "疆域";
+		document.getElementById("citylevel").innerHTML = "等级";
 		document.getElementById("peoplename").innerHTML = "村民： " + peopleList[globalData.highlightPeopleId].data.familyName + peopleList[globalData.highlightPeopleId].data.givenName;
 		document.getElementById("carry").innerHTML = "携带： " + peopleList[globalData.highlightPeopleId].data.resource + " (" + peopleList[globalData.highlightPeopleId].data.starve + ")";
 		document.getElementById("power").innerHTML = "战力： " + peopleList[globalData.highlightPeopleId].data.power + " (" + peopleList[globalData.highlightPeopleId].data.rescombat + ")";
@@ -230,10 +232,12 @@ function showStatus() {
 	else if (globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
 		document.getElementById("coord").innerHTML = "坐标： " + globalData.highlightPosX.toString() + " " + globalData.highlightPosY.toString();
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].rescount;
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].cityculture != Cityid.none?cityList[mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].cityculture].data.familyName:"-");
 		document.getElementById("cityname").innerHTML = "城市： " + cityList[globalData.highlightCityId].data.familyName;
 		document.getElementById("store").innerHTML = "储备： " + cityList[globalData.highlightCityId].data.resource;
 		document.getElementById("citizen").innerHTML = "人口： " + cityList[globalData.highlightCityId].data.peopleidlist.length;
 		document.getElementById("territory").innerHTML = "疆域： " + cityList[globalData.highlightCityId].data.territory;
+		document.getElementById("citylevel").innerHTML = "等级： " + cityList[globalData.highlightCityId].data.citySize;
 		document.getElementById("peoplename").innerHTML = "村民";
 		document.getElementById("carry").innerHTML = "携带";
 		document.getElementById("power").innerHTML = "战力";
@@ -246,10 +250,12 @@ function showStatus() {
 	else{
 		document.getElementById("coord").innerHTML = "坐标： " + globalData.highlightPosX.toString() + " " + globalData.highlightPosY.toString();
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].rescount;	
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].cityculture != Cityid.none?cityList[mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].cityculture].data.familyName:"-");
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("store").innerHTML = "储备";
 		document.getElementById("citizen").innerHTML = "人口";
 		document.getElementById("territory").innerHTML = "疆域";
+		document.getElementById("citylevel").innerHTML = "等级";
 		document.getElementById("peoplename").innerHTML = "村民";
 		document.getElementById("carry").innerHTML = "携带";
 		document.getElementById("power").innerHTML = "战力";
@@ -263,10 +269,68 @@ function showStatus() {
 }
 
 function showTable() {
-	//TODO: 每次生成表格后，都生成新的排序实例，开销未知
-	globalData.excel = null;	//销毁旧的实例
+	//城市表格
+	//每次生成表格后，都生成新的排序实例，开销未知
+	globalData.excel_city = null;	//销毁旧的实例
 
-	var tab="<table>";
+	var tab="<table_city>";
+	tab += "<tr class=\"top\"><td>城市</td><td>人口</td><td >等级</td><td>储备</td><td>疆域</td></tr>";
+
+	if (globalData.highlightPeopleId != Peopleid.none){
+		var people = peopleList[globalData.highlightPeopleId];
+		var city = cityList[people.data.cityid];
+		//----
+		tab+="<tr>"
+		tab+="<td>" + city.data.familyName + "</td>";																//城市
+		tab+="<td>" + city.data.peopleidlist.length + "</td>";														//人口
+		tab+="<td>" + city.data.citySize + "</td>";																	//等级
+		tab+="<td>" + city.data.resource + "</td>";																	//储备
+		tab+="<td>" + city.data.territory + "</td>";																//疆域
+		tab+="</tr>"
+		//----
+	}
+	else if (globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
+		var city = cityList[globalData.highlightCityId];
+		//----
+		tab+="<tr>"
+		tab+="<td>" + city.data.familyName + "</td>";																//城市
+		tab+="<td>" + city.data.peopleidlist.length + "</td>";														//人口
+		tab+="<td>" + city.data.citySize + "</td>";																	//等级
+		tab+="<td>" + city.data.resource + "</td>";																	//储备
+		tab+="<td>" + city.data.territory + "</td>";																//疆域
+		tab+="</tr>"
+		//----		
+	}
+	else {
+		var showMax = TableRowMax;	//最多显示多少行
+		for (var i=0; i<cityList.length && showMax>0; i++) {	
+			if (cityList[i].data.alive == Cityalive.yes) {
+				showMax -= 1;
+				var city = cityList[i];
+				//----
+				tab+="<tr>"
+				tab+="<td>" + city.data.familyName + "</td>";																//城市
+				tab+="<td>" + city.data.peopleidlist.length + "</td>";														//人口
+				tab+="<td>" + city.data.citySize + "</td>";																	//等级
+				tab+="<td>" + city.data.resource + "</td>";																	//储备
+				tab+="<td>" + city.data.territory + "</td>";																//疆域
+				tab+="</tr>"
+				//----		
+			}
+		}	
+	}
+	tab+="</table>";
+	var table=document.getElementById("table_city");
+	table.innerHTML=tab;
+	
+	globalData.excel_people = new tableSort('table_city',1,2,999,'up','down','hov'); //创建新的实例，能够排序
+	
+	
+	//居民表格
+	//每次生成表格后，都生成新的排序实例，开销未知
+	globalData.excel_people = null;	//销毁旧的实例
+
+	var tab="<table_people>";
 	tab += "<tr class=\"top\"><td>村民</td><td>寿命</td><td >胜率</td><td>收益</td><td>战力</td><td>采集</td><td>回收</td></tr>";
 
 	if (globalData.highlightPeopleId != Peopleid.none){
@@ -335,10 +399,10 @@ function showTable() {
 		}	
 	}
 	tab+="</table>";
-	var table=document.getElementById("table");
+	var table=document.getElementById("table_people");
 	table.innerHTML=tab;
 	
-	globalData.excel = new tableSort('table',1,2,999,'up','down','hov'); //创建新的实例，能够排序
+	globalData.excel_people = new tableSort('table_people',1,2,999,'up','down','hov'); //创建新的实例，能够排序
 }
 
 function updateAll(){
