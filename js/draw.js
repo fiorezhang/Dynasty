@@ -263,7 +263,7 @@ function showTable() {
 	else {
 		var showMax = TableRowMax;	//最多显示多少行
 		for (var i=0; i<cityList.length && showMax>0; i++) {	
-			if (cityList[i].data.alive == Cityalive.yes) {
+			if (cityList[i] != null && cityList[i].data.alive == Cityalive.yes) {
 				showMax -= 1;
 				var city = cityList[i];
 				//----
@@ -393,38 +393,4 @@ function showTable() {
 			}
 		};
 	}	
-}
-
-function updateAll(){
-	//每回合更新地图
-	mapMain.update(globalData.dayMain);
-	globalData.foodCount = 0;
-	for (var i=0; i<globalData.mapCellSize; i++){
-        for (var j=0; j<globalData.mapCellSize; j++){
-			//统计野外的矿的总数
-			if (mapMain.data.cells[i][j].resource == Resource.food){
-				globalData.foodCount += mapMain.data.cells[i][j].rescount;
-			}
-		}
-	}
-
-	//每回合更新各个城市，顺便统计数据
-	for (var i=0; i<cityList.length; i++){
-		if (cityList[i].data.alive == Cityalive.yes){
-			cityList[i].update(globalData.dayMain);
-		}
-	}
-
-	//每回合更新各个人，顺便统计数据
-	var ageSum = 0;
-	for (var i=0; i<peopleList.length; i++){
-		if (peopleList[i].data.alive == Peoplealive.yes){
-			peopleList[i].update(globalData.dayMain);
-			ageSum += peopleList[i].data.age;
-		}
-	}
-	if (globalData.peoplealivelist.length > 0) {
-		globalData.ageAverage = Math.floor(ageSum / globalData.peoplealivelist.length);
-	}
-	
 }

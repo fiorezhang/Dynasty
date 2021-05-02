@@ -173,13 +173,7 @@ class Map{
 			}			
 		}
 		//生成新城市
-		var cityCount = 0; 
-		for (var i=0; i<cityList.length; i++) {
-			if (cityList[i].data.alive == Cityalive.yes) {
-				cityCount += 1;
-			}
-		}
-		if (day >= this.data.dayNext && cityCount < CityNumMax) {
+		if (day >= this.data.dayNext && globalData.cityalivelist.length < CityNumMax) {
 			var city = new City(Citysize.small);
 			if (city.data.id != Cityid.none){	//成功生成
 				cityList.push(city);

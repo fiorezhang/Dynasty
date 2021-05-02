@@ -47,7 +47,7 @@ function unique(arr) {
   return Array.from(new Set(arr))
 }
 
-
+//存档
 function save(){
 	var savedgame = {
 		global: globalData, 
@@ -55,13 +55,14 @@ function save(){
 		cityl: cityList, 
 		peoplel: peopleList, 
 	}
-	//console.log(savedgame);
-	localStorage.setItem("save", JSON.stringify(savedgame));
+	console.log(JSON.stringify(savedgame));
+	localStorage.setItem("dynasty", JSON.stringify(savedgame));
 }
 
+//读档
 function load(){
-	var savedgame = JSON.parse(localStorage.getItem("save"));
-	//console.log(savedgame);
+	console.log(localStorage.getItem("save"));
+	var savedgame = JSON.parse(localStorage.getItem("dynasty"));
 	if (savedgame != null && savedgame != undefined){
 		globalData = savedgame.global;
 		
@@ -69,7 +70,9 @@ function load(){
 		cityList = new Array();
 		for (var i=0; i<savedgame.cityl.length; i++){
 			var city = new City(Citysize.none);
-			city.data = savedgame.cityl[i].data;
+			if (savedgame.cityl[i] != null) {
+				city.data = savedgame.cityl[i].data;
+			}
 			cityList.push(city);
 		}
 
@@ -77,7 +80,9 @@ function load(){
 		peopleList = new Array();
 		for (var i=0; i<savedgame.peoplel.length; i++){
 			var people = new People(Cityid.none);
-			people.data = savedgame.peoplel[i].data;
+			if (savedgame.peoplel[i] != null) {
+				people.data = savedgame.peoplel[i].data;
+			}
 			peopleList.push(people);
 		}
 

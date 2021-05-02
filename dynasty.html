@@ -229,6 +229,47 @@ function initNewMap(){
 }
 
 
+function updateAll(){
+	//每回合更新地图
+	mapMain.update(globalData.dayMain);
+	globalData.foodCount = 0;
+	for (var i=0; i<globalData.mapCellSize; i++){
+        for (var j=0; j<globalData.mapCellSize; j++){
+			//统计野外的矿的总数
+			if (mapMain.data.cells[i][j].resource == Resource.food){
+				globalData.foodCount += mapMain.data.cells[i][j].rescount;
+			}
+		}
+	}
+
+	//每回合更新各个城市，顺便统计数据
+	for (var i=0; i<cityList.length; i++){
+		if (cityList[i] != null && cityList[i].data.alive == Cityalive.yes){
+			cityList[i].update(globalData.dayMain);
+		}
+		else{
+			cityList[i] = null;	//为节省空间，当实例作废后，标记成null
+		}
+	}
+
+	//每回合更新各个人，顺便统计数据
+	var ageSum = 0;
+	for (var i=0; i<peopleList.length; i++){
+		if (peopleList[i] != null && peopleList[i].data.alive == Peoplealive.yes){
+			peopleList[i].update(globalData.dayMain);
+			ageSum += peopleList[i].data.age;
+		}
+		else{
+			peopleList[i] = null;	//为节省空间，当实例作废后，标记成null
+		}
+	}
+	if (globalData.peoplealivelist.length > 0) {
+		globalData.ageAverage = Math.floor(ageSum / globalData.peoplealivelist.length);
+	}
+	
+}
+
+
 //单步更新所有游戏元素的状态，包括地图，城市，人口等等
 function stepCa(){
 	globalData.consoleLog = document.getElementById("debug").value;

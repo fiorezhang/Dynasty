@@ -150,6 +150,14 @@ class City{
 					mapMain.data.cells[this.data.posX+i][this.data.posY+j].cityid = Cityid.none;
 				}
 			}	
+			//城市销毁时，把文化也从地图上清除掉
+			for (var i=0; i<globalData.mapCellSize; i++){
+				for (var j=0; j<globalData.mapCellSize; j++){
+					if (mapMain.data.cells[i][j].cityculture == this.data.id) {
+						mapMain.data.cells[i][j].cityculture = Cityid.none;
+					}
+				}
+			}
 			var cityl = globalData.cityalivelist;
 			cityl.splice(cityl.indexOf(this.data.id), 1);
 			this.data.alive = Cityalive.no;
