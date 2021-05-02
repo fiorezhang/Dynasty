@@ -7,26 +7,21 @@
 	box-shadow: 10px 10px 5px #888888;
 }
 #console2 {
-	width:260px;
-	height:230px;
+	width:270px;
+	height:240px;
 	background-color:#EEEEEE;
 	padding: 10px 10px;
-	margin: 20px 10px;
+	margin: 10px 10px;
 	box-shadow: 10px 10px 5px #888888;
-}
-#console2_wrap {
-	width:290px;
-	height:1060px;
-	background-color:#EEEEEE;
-	margin: 20px 10px;
 }
 #console3 {
-	width:580px;
-	height:500px;
+	width:620px;
+	height:510px;
 	background-color:#EEEEEE;
-	padding: 10px 30px;
-	margin: 20px 10px;
+	padding: 10px 10px;
+	margin: 10px 10px;
 	box-shadow: 10px 10px 5px #888888;
+	overflow:auto;
 }
 .button {
     background-color: white; 

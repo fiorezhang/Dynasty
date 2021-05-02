@@ -1,6 +1,8 @@
 table{margin:10px auto;} 
-td{width:100px;height:24px;text-align:center;line-height:24px;border:1px solid silver;} 
+td{width:100px;height:20px;text-align:center;line-height:20px;font-size: 12px;border:1px solid silver;} 
 .top{background:#CCCCCC;cursor:pointer;font-weight:bold} 
+.left_city{cursor:pointer;}
+.left_people{cursor:pointer;}
 .up{background:#CCFFCC;} 
 .down{background:#FFCCCC;} 
-.hov{background:#EEEEEE;} 
+.hov{background:#F8F8F8;} 

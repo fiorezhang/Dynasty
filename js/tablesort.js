@@ -22,25 +22,26 @@ tableSort.prototype = {
 		var defaultClass = this.Tags[0].className; 
 		for(var Tag ,i=0;Tag = this.Tags[i];i++){ 
 			Tag.index = i; 
-			addEventListener(Tag ,'click', Bind(Tag,statu)); 
+			addEventListener(Tag ,'click', Bind(Tag,statu_up)); 
+			addEventListener(Tag ,'dblclick', Bind(Tag,statu_down)); 
 		} 
 
 		var _this =this; 
-		var turn = 0; 
-		function statu(){ 
+
+		function statu_up(){ 
 			for(var i=0;i<_this.Tags.length;i++){ 
 				_this.Tags[i].className = defaultClass; 
 			} 
-			if(turn==0){ 
-				addClass(this,_this.up) 
-				_this.startArray(1,this.index); 
-				turn=1; 
-			}else{ 
-				addClass(this,_this.down) 
-				_this.startArray(0,this.index); 
-				turn=0; 
-			} 
+			addClass(this,_this.up) 
+			_this.startArray(1,this.index); 
 		} 
+		function statu_down(){ 
+			for(var i=0;i<_this.Tags.length;i++){ 
+				_this.Tags[i].className = defaultClass; 
+			} 
+			addClass(this,_this.down) 
+			_this.startArray(0,this.index); 
+		} 		
 	}, 
 
 	//设置选中列样式 

@@ -17,6 +17,7 @@ class People{
 						'age':Peopleage.none,
 						'combatcount':0, 
 						'combatcountwin':0, 
+						'combatrate':null,
 						'combatdirect':Direct.none, 
 						'feeddirect':Direct.none,
 						'id':Peopleid.none, 
@@ -82,7 +83,8 @@ class People{
 		}
 		
 		mapMain.data.cells[this.data.posX][this.data.posY].peopleid = this.data.id;
-		cityList[this.data.cityid].data.peopleidlist.push(this.data.id);
+		cityList[this.data.cityid].data.peoplealivelist.push(this.data.id);
+		globalData.peoplealivelist.push(this.data.id);
 	}
 	
 
@@ -239,8 +241,10 @@ class People{
 	
 	dead(){
 		mapMain.data.cells[this.data.posX][this.data.posY].peopleid = Peopleid.none;
-		var peoplel = cityList[this.data.cityid].data.peopleidlist;
-		peoplel.splice(peoplel.indexOf(this.data.id), 1)
+		var peoplel = cityList[this.data.cityid].data.peoplealivelist;
+		peoplel.splice(peoplel.indexOf(this.data.id), 1);
+		var peoplel = globalData.peoplealivelist;
+		peoplel.splice(peoplel.indexOf(this.data.id), 1);
 		this.data.alive = Peoplealive.no;
 	}
 	
@@ -398,6 +402,10 @@ class People{
 		}
 		else {
 			this.data.combatdirect = Direct.none;
+		}
+		//单独计算胜率
+		if (this.data.combatcount > 0){																									
+			this.data.combatrate = Math.floor(100*this.data.combatcountwin/this.data.combatcount);
 		}
 		
 		if (acted == 0)	{//没有救济队友或者发动战争

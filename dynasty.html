@@ -129,15 +129,15 @@ var MapWaterLoop = 15;
 var MapResourceSeed = 0.45;
 var MapResourceLoop = 10;
 
-var TableRowMax = 15;
+var TableRowMax = 1000;
 //常量变量定义-
 
 //全局变量，存档时需要保存
 var globalData = {	'consoleLog':0,
 					'secondCycle':1, 
 					'dayMain':0,	//记录回合数（天数），地图资源等按照一定天数间隔刷新，人物按照天数为最小单位来决定行动（更新状态机）
-					'cityAlive':0, 
-					'peopleAlive':0, 
+					'cityalivelist':null,
+					'peoplealivelist':null, 
 					'combatMain':0, //战争计数器
 					'mapCellSize':10, 	//地图尺寸，N x N的方格地图
 					'cityNum':10, 	//初始生成多少个城市
@@ -179,6 +179,56 @@ var peopleList = new Array();
 //初始化地图，城市，人口等等
 initNewMap();
 
+//加载以及“生成”新地图时调用
+function initNewMap(){
+	//清除list的ID标识并重新生成类
+	City.idStatic = 0;
+	cityList = new Array();
+	People.idStatic = 0;
+	peopleList = new Array();
+	
+	globalData.cityalivelist = new Array();
+	globalData.peoplealivelist = new Array();
+	
+	//日期归零
+	globalData.dayMain = 0;
+
+	//根据输入确定地图尺寸
+	globalData.mapCellSize = document.getElementById("size").value;
+
+	//生成地图实例，并初始化湖泊矿产等等
+	mapMain = new Map(globalData.mapCellSize);
+	mapMain.init();
+
+	//生成城市，以增量方式存放在list里面，list为了保证可索引必须唯一
+	for (var i=0; i<globalData.cityNum; i++){
+		var city = new City(Citysize.small);
+		if (city.data.id != Cityid.none){
+			cityList.push(city);
+			//生成初始人口，以增量方式存放在list里面，所有的人口放在同一个list且list必须唯一
+			for (var j=0; j<globalData.peopleNumCity; j++){
+				var people = new People(city.data.id, Peopleresource.standard);
+				if (people.data.id != Peopleid.none){
+					peopleList.push(people);
+				}				
+			}
+		}
+	}
+	
+	//打印所有信息，可以关掉
+	if (globalData.consoleLog == 1){
+		console.log(globalData);
+		console.log(mapMain);
+		console.log(cityList);
+		console.log(peopleList);
+	}
+	
+	//Canavas画出来
+	drawCells();	
+	showHighlight();
+}
+
+
 //单步更新所有游戏元素的状态，包括地图，城市，人口等等
 function stepCa(){
 	globalData.consoleLog = document.getElementById("debug").value;
@@ -190,6 +240,7 @@ function stepCa(){
 
 	//打印所有信息，可以关掉
 	if (globalData.consoleLog == 1){
+		console.log(globalData);
 		console.log(mapMain);
 		console.log(cityList);
 		console.log(peopleList);

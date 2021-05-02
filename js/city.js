@@ -2,7 +2,7 @@ class City{
 	static idStatic = 0;
 	
 	constructor(size){
-		this.data = {'posX':0, 'posY':0, 'alive':Cityalive.no, 'resource':0, 'dayNext':Daypeople, 'citySize':0, 'id':Cityid.none, 'familyName':'', 'territory':0, 'peopleidlist':null, 'rescelllist':null};
+		this.data = {'posX':0, 'posY':0, 'alive':Cityalive.no, 'resource':0, 'dayNext':Daypeople, 'citySize':0, 'id':Cityid.none, 'familyName':'', 'territory':0, 'peoplealivelist':null, 'rescelllist':null};
 		
 		if (size == Citysize.none){	//专门设计给读档
 			City.idStatic += 1;
@@ -78,15 +78,17 @@ class City{
 		}
 		
 		//建立城市人口list
-		this.data.peopleidlist = new Array();
+		this.data.peoplealivelist = new Array();
 		
 		//建立资源list
 		this.data.rescelllist = new Array();
+		
+		globalData.cityalivelist.push(this.data.id);
 	}
 	
 	update(day){
 		//间隔一段时间，如果有足够资源，生成新的市民
-		if (day >= this.data.dayNext && this.data.peopleidlist.length < PeopleNumIndex * this.data.citySize && this.data.resource >= Peopleresource.starve) {	//城市容纳人数为8x城市大小
+		if (day >= this.data.dayNext && this.data.peoplealivelist.length < PeopleNumIndex * this.data.citySize && this.data.resource >= Peopleresource.starve) {	//城市容纳人数为8x城市大小
 			var resourceBorn = Math.min(this.data.resource, Peopleresource.standard);
 			var people = new People(this.data.id, resourceBorn);
 			if (people.data.id != Peopleid.none){	//成功生成
@@ -141,13 +143,15 @@ class City{
 		}
 		
 		//销毁城市
-		if (this.data.resource < Peopleresource.starve && this.data.peopleidlist.length == 0) {
+		if (this.data.resource < Peopleresource.starve && this.data.peoplealivelist.length == 0) {
 			for (var i=-Citysize.big; i<=Citysize.big; i++){
 				for (var j=-Citysize.big; j<=Citysize.big; j++){
 					mapMain.data.cells[this.data.posX+i][this.data.posY+j].citybase = Citybase.none;
 					mapMain.data.cells[this.data.posX+i][this.data.posY+j].cityid = Cityid.none;
 				}
 			}	
+			var cityl = globalData.cityalivelist;
+			cityl.splice(cityl.indexOf(this.data.id), 1);
 			this.data.alive = Cityalive.no;
 		}
 	}
