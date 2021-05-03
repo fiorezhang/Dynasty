@@ -31,14 +31,14 @@ function drawCells(){
 			//绘制城市
 			if (mapMain.data.cells[i][j].citybase == Citybase.zone){
 				var city = cityList[mapMain.data.cells[i][j].cityid];
-				contextMap.fillStyle=getSeededRandomColor(16,255,city.data.id);
+				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
 				contextMap.fillRect(i*cellSide, j*cellSide, cellSide, cellSide);
 				contextMap.fillStyle="white";
 				contextMap.fillRect(i*cellSide+2, j*cellSide+2, cellSide-4, cellSide-4);	//城市其它格子，空心颜色
 			}
 			if (mapMain.data.cells[i][j].citybase == Citybase.center){
 				var city = cityList[mapMain.data.cells[i][j].cityid];
-				contextMap.fillStyle=getSeededRandomColor(16,255,city.data.id);
+				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
 				contextMap.fillRect(i*cellSide, j*cellSide, cellSide, cellSide);	//城市中心格子，实心颜色
 			}		
 			//绘制人
@@ -49,8 +49,8 @@ function drawCells(){
 				var people = peopleList[mapMain.data.cells[i][j].peopleid];
 				var city = cityList[people.data.cityid];
 				var gradient = contextMap.createRadialGradient(vertexX, vertexY, Math.max(cellSide/8,1), vertexX, vertexY, cellSide/6);	//中心四分之一的个人颜色，到三分之一处是部族颜色
-				gradient.addColorStop(0, getSeededRandomColor(16,255, people.data.id));
-				gradient.addColorStop(1, getSeededRandomColor(16,255,city.data.id));
+				gradient.addColorStop(0, getSeededRandomColor(32,255, people.data.id));
+				gradient.addColorStop(1, getSeededRandomColor(32,255,city.data.id));
 				contextMap.fillStyle = gradient;
 				contextMap.beginPath();
 				contextMap.arc(vertexX, vertexY, cellSide/2-1, 0, 2*Math.PI);
@@ -59,7 +59,7 @@ function drawCells(){
 			//绘制文化
 			if (mapMain.data.cells[i][j].cityculture != Cityid.none){
 				var city = cityList[mapMain.data.cells[i][j].cityculture];
-				contextMap.fillStyle=getSeededRandomColor(16,255,city.data.id);
+				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
 				//contextMap.fillRect(i*cellSide+cellSide/2-1, j*cellSide+cellSide/2-1, 2, 2);
 				if (i>=1 && mapMain.data.cells[i][j].cityculture != mapMain.data.cells[i-1][j].cityculture){
 					contextMap.fillRect(i*cellSide, (j+1/4)*cellSide, 1, cellSide/2);
@@ -137,7 +137,7 @@ function showHighlight() {
 			contextMap.fillRect(posPeopleX*cellSide, (posPeopleY+1)*cellSide-1, cellSide, 1);
 			contextMap.fillRect((posPeopleX+1)*cellSide-1, posPeopleY*cellSide, 1, cellSide);	
 		}
-		contextMap.fillStyle=getSeededRandomColor(16,255,city.data.id);
+		contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
 		for (var i=0; i<globalData.mapCellSize; i++){
 			for (var j=0; j<globalData.mapCellSize; j++){
 				if (mapMain.data.cells[i][j].cityculture == city.data.id) {

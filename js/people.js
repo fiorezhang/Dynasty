@@ -403,7 +403,7 @@ class People{
 			this.data.feeddirect = Direct.none;
 		}
 		
-		if (acted == 0 && peopleIdEnemy != Peopleid.none && this.data.resource < Peopleresource.starve && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过
+		if (acted == 0 && peopleIdEnemy != Peopleid.none && (this.data.resource < Peopleresource.standard || (this.data.resource < Peopleresource.enough && mapMain.data.cells[peopleList[peopleIdEnemy].data.posX][peopleList[peopleIdEnemy].data.posY].cityculture == this.data.cityid)) && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过（自己饥饿或者在自己境内）
 			this.combat(peopleIdEnemy);
 			acted = 1;
 		}

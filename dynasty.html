@@ -121,12 +121,12 @@ var Daypeople = 100;
 var Daycity = 1000;
 var Dayculture = 1;
 
-var CityNumMax = 20;
+var CityNumMax = 30;
 var PeopleNumIndex = 10;
 
-var MapWaterSeed = 0.41;
+var MapWaterSeed = 0.42;
 var MapWaterLoop = 15;
-var MapResourceSeed = 0.45;
+var MapResourceSeed = 0.44;
 var MapResourceLoop = 10;
 
 var TableRowMax = 1000;
@@ -192,6 +192,9 @@ function initNewMap(){
 	
 	//日期归零
 	globalData.dayMain = 0;
+	
+	//战争数归零
+	globalData.combatMain = 0;
 
 	//根据输入确定地图尺寸
 	globalData.mapCellSize = document.getElementById("size").value;
