@@ -241,8 +241,10 @@ class People{
 	
 	dead(){
 		mapMain.data.cells[this.data.posX][this.data.posY].peopleid = Peopleid.none;
-		var peoplel = cityList[this.data.cityid].data.peoplealivelist;
-		peoplel.splice(peoplel.indexOf(this.data.id), 1);
+		if (cityList[this.data.cityid] != null) {
+			var peoplel = cityList[this.data.cityid].data.peoplealivelist;
+			peoplel.splice(peoplel.indexOf(this.data.id), 1);
+		}
 		var peoplel = globalData.peoplealivelist;
 		peoplel.splice(peoplel.indexOf(this.data.id), 1);
 		this.data.alive = Peoplealive.no;
@@ -382,12 +384,17 @@ class People{
 	}
 		
 	update(day){
+		//偶尔出现城市消失但人还在的bug，强制人死亡
+		if (cityList[this.data.cityid] == null){
+			this.dead();
+		}
+		
 		var acted = 0;	//本回合是否行动过（移动，战斗，挖矿，转移矿才算行动）
 		this.near();
 		var peopleIdFriend = this.getFriend();
 		var peopleIdEnemy = this.getEnemy();
 
-		if (acted == 0 && peopleIdFriend != Peopleid.none && this.data.starve == Peoplestarve.no && peopleList[peopleIdFriend].data.resource <= Peopleresource.dying)	//有队友并且处于濒死
+		if (acted == 0 && peopleIdFriend != Peopleid.none && this.data.starve == Peoplestarve.no && peopleList[peopleIdFriend].data.resource < Peopleresource.dying)	//有队友并且处于濒死
 		{
 			this.feed(peopleIdFriend);
 			acted = 1;
@@ -396,7 +403,7 @@ class People{
 			this.data.feeddirect = Direct.none;
 		}
 		
-		if (acted == 0 && peopleIdEnemy != Peopleid.none && this.data.resource <= Peopleresource.enough && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过
+		if (acted == 0 && peopleIdEnemy != Peopleid.none && this.data.resource < Peopleresource.starve && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过
 			this.combat(peopleIdEnemy);
 			acted = 1;
 		}

@@ -87,11 +87,13 @@ class City{
 	}
 	
 	update(day){
+		var peopleBorn = 0;	//标记是否本轮生成市民
 		//间隔一段时间，如果有足够资源，生成新的市民
 		if (day >= this.data.dayNext && this.data.peoplealivelist.length < PeopleNumIndex * this.data.citySize && this.data.resource >= Peopleresource.starve) {	//城市容纳人数为8x城市大小
 			var resourceBorn = Math.min(this.data.resource, Peopleresource.standard);
 			var people = new People(this.data.id, resourceBorn);
 			if (people.data.id != Peopleid.none){	//成功生成
+				peopleBorn = 1;
 				peopleList.push(people);
 				this.data.resource -= resourceBorn;
 				this.data.dayNext = day + getRandom(1, Daypeople*2);	//随机指定下一个生成市民的天数，平均值为设定的天数
@@ -143,7 +145,7 @@ class City{
 		}
 		
 		//销毁城市
-		if (this.data.resource < Peopleresource.starve && this.data.peoplealivelist.length == 0) {
+		if (peopleBorn == 0 && this.data.resource < Peopleresource.starve && this.data.peoplealivelist.length == 0) {
 			for (var i=-Citysize.big; i<=Citysize.big; i++){
 				for (var j=-Citysize.big; j<=Citysize.big; j++){
 					mapMain.data.cells[this.data.posX+i][this.data.posY+j].citybase = Citybase.none;
@@ -156,6 +158,12 @@ class City{
 					if (mapMain.data.cells[i][j].cityculture == this.data.id) {
 						mapMain.data.cells[i][j].cityculture = Cityid.none;
 					}
+				}
+			}
+			//确保清除城市对应人口
+			for (var i=0; i<peopleList.length; i++) {
+				if (peopleList[i] != null && peopleList[i].data.cityid == this.data.id){
+					peopleList[i].dead();
 				}
 			}
 			var cityl = globalData.cityalivelist;

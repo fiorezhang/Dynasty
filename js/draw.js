@@ -120,11 +120,11 @@ function showHighlight() {
 	//绘制高亮记号（仅用于调试）
 	var posX, posY;
 	var cellSide = Math.round(windowSizeMap / globalData.mapCellSize); //边长
-	if (peopleList.length > 0 && globalData.highlightPeopleId != Peopleid.none){
+	if (peopleList.length > 0 && globalData.highlightPeopleId != Peopleid.none && peopleList[globalData.highlightPeopleId] != null){
 		posX = peopleList[globalData.highlightPeopleId].data.posX;
 		posY = peopleList[globalData.highlightPeopleId].data.posY;
 	}
-	else if (cityList.length > 0 && globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
+	else if (cityList.length > 0 && globalData.highlightCityId != Cityid.none && cityList[globalData.highlightCityId] != null && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
 		posX = globalData.highlightPosX;
 		posY = globalData.highlightPosY;
 		var city = cityList[globalData.highlightCityId];
@@ -166,7 +166,7 @@ function showStatus() {
 	document.getElementById("ageavg").innerHTML = "均寿： " + globalData.ageAverage;
 	document.getElementById("combat").innerHTML = "战争： " + globalData.combatMain;
 	document.getElementById("foodcnt").innerHTML = "野矿： " + globalData.foodCount;	
-	if (globalData.highlightPeopleId != Peopleid.none){
+	if (globalData.highlightPeopleId != Peopleid.none && peopleList[globalData.highlightPeopleId] != null){
 		document.getElementById("coord").innerHTML = "坐标： " + peopleList[globalData.highlightPeopleId].data.posX + " , " + peopleList[globalData.highlightPeopleId].data.posY;
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[peopleList[globalData.highlightPeopleId].data.posX][peopleList[globalData.highlightPeopleId].data.posY].rescount;	
 		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[peopleList[globalData.highlightPeopleId].data.posX][peopleList[globalData.highlightPeopleId].data.posY].cityculture != Cityid.none?cityList[mapMain.data.cells[peopleList[globalData.highlightPeopleId].data.posX][peopleList[globalData.highlightPeopleId].data.posY].cityculture].data.familyName:"-");	
@@ -184,7 +184,7 @@ function showStatus() {
 		document.getElementById("age").innerHTML = "寿命： " + peopleList[globalData.highlightPeopleId].data.age;
 		document.getElementById("revenue").innerHTML = "收益： " + (peopleList[globalData.highlightPeopleId].data.rescombat + peopleList[globalData.highlightPeopleId].data.rescollect + peopleList[globalData.highlightPeopleId].data.resrecycle) + " / " + peopleList[globalData.highlightPeopleId].data.resconsume;
 	}	
-	else if (globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
+	else if (globalData.highlightCityId != Cityid.none && cityList[globalData.highlightCityId] != null && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
 		document.getElementById("coord").innerHTML = "坐标： " + globalData.highlightPosX.toString() + " " + globalData.highlightPosY.toString();
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].rescount;
 		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].cityculture != Cityid.none?cityList[mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].cityculture].data.familyName:"-");
@@ -233,7 +233,7 @@ function showTable() {
 	var tab="<table_city>";
 	tab += "<tr class=\"top\"><td>ID</td><td>城市</td><td>人口</td><td >等级</td><td>储备</td><td>疆域</td></tr>";
 
-	if (globalData.highlightPeopleId != Peopleid.none){
+	if (globalData.highlightPeopleId != Peopleid.none && peopleList[globalData.highlightPeopleId] != null){
 		var people = peopleList[globalData.highlightPeopleId];
 		var city = cityList[people.data.cityid];
 		//----
@@ -247,7 +247,7 @@ function showTable() {
 		tab+="</tr>";
 		//----
 	}
-	else if (globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
+	else if (globalData.highlightCityId != Cityid.none && cityList[globalData.highlightCityId] != null && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
 		var city = cityList[globalData.highlightCityId];
 		//----
 		tab+="<tr>";
@@ -314,7 +314,7 @@ function showTable() {
 	var tab="<table_people>";
 	tab += "<tr class=\"top\"><td>ID</td><td>村民</td><td>寿命</td><td >胜率</td><td>收益</td><td>战力</td><td>采集</td><td>回收</td><td>能力</td></tr>";
 
-	if (globalData.highlightPeopleId != Peopleid.none){
+	if (globalData.highlightPeopleId != Peopleid.none && peopleList[globalData.highlightPeopleId] != null){
 		var people = peopleList[globalData.highlightPeopleId];
 		//----
 		tab+="<tr>";
@@ -330,7 +330,7 @@ function showTable() {
 		tab+="</tr>";
 		//----
 	}
-	else if (globalData.highlightCityId != Cityid.none && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
+	else if (globalData.highlightCityId != Cityid.none && cityList[globalData.highlightCityId] != null && mapMain.data.cells[globalData.highlightPosX][globalData.highlightPosY].citybase == Citybase.center){
 		for (var i=0; i<Math.min(cityList[globalData.highlightCityId].data.peoplealivelist.length, TableRowMax); i++) {
 			var people = peopleList[cityList[globalData.highlightCityId].data.peoplealivelist[i]];
 			//----
