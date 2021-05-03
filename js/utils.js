@@ -50,7 +50,7 @@ function unique(arr) {
 //存档
 function save(){
 	var savedgame = {
-		global: globalData, 
+		global: glbData, 
 		map: mapMain, 
 		cityl: cityList, 
 		peoplel: peopleList, 
@@ -64,12 +64,12 @@ function load(){
 	console.log(localStorage.getItem("save"));
 	var savedgame = JSON.parse(localStorage.getItem("dynasty"));
 	if (savedgame != null && savedgame != undefined){
-		globalData = savedgame.global;
+		glbData = savedgame.global;
 		
 		City.idStatic = 0;
 		cityList = new Array();
 		for (var i=0; i<savedgame.cityl.length; i++){
-			var city = new City(Citysize.none);
+			var city = new City(CitySize.none);
 			if (savedgame.cityl[i] != null) {
 				city.data = savedgame.cityl[i].data;
 			}
@@ -79,7 +79,7 @@ function load(){
 		People.idStatic = 0;
 		peopleList = new Array();
 		for (var i=0; i<savedgame.peoplel.length; i++){
-			var people = new People(Cityid.none);
+			var people = new People(CityId.none);
 			if (savedgame.peoplel[i] != null) {
 				people.data = savedgame.peoplel[i].data;
 			}

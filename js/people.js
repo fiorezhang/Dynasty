@@ -1,53 +1,53 @@
 class People{
 	static idStatic = 0;
 	
-	constructor(cityid, resourceborn){
-		this.data = {	'alive':Peoplealive.no, 
+	constructor(cId, resourceborn){
+		this.data = {	'alive':PeopleAlive.no, 
 						'posX':0, 
 						'posY':0, 
-						'cityid':cityid, 
-						'resource':resourceborn, 
+						'cId':cId, 
+						'resCt':resourceborn, 
+						'power':0, 
 						'collect':0, 
 						'recycle':0, 
 						'consume':0,
-						'rescell':{'posX':-1, 'posY':-1},
-						'starve':Peoplestarve.no,
-						'power':0, 
-						'peopleNearList':{'nearwest':Peopleid.none, 'neareast':Peopleid.none, 'nearnorth':Peopleid.none, 'nearsouth':Peopleid.none}, 
-						'age':Peopleage.none,
-						'combatcount':0, 
-						'combatcountwin':0, 
-						'combatrate':null,
-						'combatdirect':Direct.none, 
-						'feeddirect':Direct.none,
-						'id':Peopleid.none, 
-						'familyName':'',
-						'givenName':'',
+						'resCell':{'posX':-1, 'posY':-1},
+						'starve':PeopleStarve.no,
+						'pNearList':{'nrW':PeopleId.none, 'nrE':PeopleId.none, 'nrN':PeopleId.none, 'nrS':PeopleId.none}, 
+						'age':PeopleAge.none,
+						'cbtCt':0, 
+						'cbtWn':0, 
+						'cbtWR':null,
+						'cbtDir':Direct.none, 
+						'feedDir':Direct.none,
+						'id':PeopleId.none, 
+						'fmName':'',
+						'gvName':'',
 						'direct':Direct.none,
-						'rescombat':0,
-						'rescollect':0,
-						'resrecycle':0,
-						'resconsume':0,
+						'resCombat':0,
+						'resCollect':0,
+						'resRecycle':0,
+						'resConsume':0,
 						};
 
-		if (cityid == Cityid.none){	//专门设计给读档
+		if (cId == CityId.none){	//专门设计给读档
 			People.idStatic += 1;
 			return;
 		}
 
-		this.data.consume = Peopleconsume.max;	//TODO:应该设计成消耗大于（不等于）回收
+		this.data.consume = PeopleConsume.max;	//TODO:应该设计成消耗大于（不等于）回收
 
-		this.data.collect = getRandom(1, Peoplecollect.max);
-		this.data.recycle = getRandom(1, Peoplerecycle.max);
-		this.data.power = getRandom(1, Peoplepower.max);
+		this.data.collect = getRandom(1, PeopleCollect.max);
+		this.data.recycle = getRandom(1, PeopleRecycle.max);
+		this.data.power = getRandom(1, PeoplePower.max);
 
-		//console.log(this.data.power, this.data.combatcount, this.data.combatcountwin);
+		//console.log(this.data.power, this.data.cbtCt, this.data.cbtWn);
 		
 		//随机生成居民
 		var countRetry = 0;		
 		var maxRetry = 20;
 		var peopleConflict = 0;
-		var city = cityList[this.data.cityid];
+		var city = cityList[this.data.cId];
 		do{
 			peopleConflict = 0;
 			this.data.posX = getRandom(city.data.posX-city.data.citySize, city.data.posX+city.data.citySize+1);
@@ -55,7 +55,7 @@ class People{
 			//console.log(this.data.posX);
 			//console.log(this.data.posY);
 
-			if (mapMain.data.cells[this.data.posX][this.data.posY].peopleid != Peopleid.none || mapMain.data.cells[this.data.posX][this.data.posY].citybase == Citybase.center){
+			if (mapMain.data.cells[this.data.posX][this.data.posY].pId != PeopleId.none || mapMain.data.cells[this.data.posX][this.data.posY].cBase == CityBase.center){
 				peopleConflict = 1;
 			}
 			countRetry += 1;
@@ -64,27 +64,27 @@ class People{
 		//console.log(countRetry, this.data.posX, this.data.posY);
 		
 		if (countRetry >= maxRetry){
-			this.data.id = Peopleid.none;
+			this.data.id = PeopleId.none;
 			return;
 		}		
 		
-		this.data.alive = Peoplealive.yes;
+		this.data.alive = PeopleAlive.yes;
 		this.data.id = People.idStatic;
 		People.idStatic += 1;
-		this.data.familyName = cityList[this.data.cityid].data.familyName;
-		this.data.givenName = getGivenName();
+		this.data.fmName = cityList[this.data.cId].data.fmName;
+		this.data.gvName = getGivenName();
 		
 		//从城市信息获取资源格位置
-		var rescelllist = cityList[this.data.cityid].data.rescelllist;
-		if (rescelllist != null && rescelllist.length > 0) {
-			var rescell = rescelllist[getRandom(0, rescelllist.length)];
-			this.data.rescell.posX = rescell.posX;
-			this.data.rescell.posY = rescell.posY;
+		var resCellList = cityList[this.data.cId].data.resCellList;
+		if (resCellList != null && resCellList.length > 0) {
+			var resCell = resCellList[getRandom(0, resCellList.length)];
+			this.data.resCell.posX = resCell.posX;
+			this.data.resCell.posY = resCell.posY;
 		}
 		
-		mapMain.data.cells[this.data.posX][this.data.posY].peopleid = this.data.id;
-		cityList[this.data.cityid].data.peoplealivelist.push(this.data.id);
-		globalData.peoplealivelist.push(this.data.id);
+		mapMain.data.cells[this.data.posX][this.data.posY].pId = this.data.id;
+		cityList[this.data.cId].data.pAliveList.push(this.data.id);
+		glbData.pAliveList.push(this.data.id);
 	}
 	
 
@@ -125,16 +125,16 @@ class People{
 				//console.log("SOUTH");
 			}
 			
-			if (mapMain.data.cells[tempPosX][tempPosY].terrain == Terrain.water || mapMain.data.cells[tempPosX][tempPosY].peopleid != Peopleid.none){
+			if (mapMain.data.cells[tempPosX][tempPosY].ter == Terrain.water || mapMain.data.cells[tempPosX][tempPosY].pId != PeopleId.none){
 				moveConflict = 1;
 				//console.log("water or people");
 			}
-			else if (mapMain.data.cells[tempPosX][tempPosY].cityid > Cityid.none){
-				if (mapMain.data.cells[tempPosX][tempPosY].cityid != this.data.cityid){	//当碰撞检测到别的城市时
+			else if (mapMain.data.cells[tempPosX][tempPosY].cId > CityId.none){
+				if (mapMain.data.cells[tempPosX][tempPosY].cId != this.data.cId){	//当碰撞检测到别的城市时
 					moveConflict = 1;
 					//console.log("other city");
 				}
-				else if(mapMain.data.cells[tempPosX][tempPosY].citybase == Citybase.center){	//当碰撞检测到本方城市中心时
+				else if(mapMain.data.cells[tempPosX][tempPosY].cBase == CityBase.center){	//当碰撞检测到本方城市中心时
 					moveConflict = 1;
 					//console.log("own city");
 				}
@@ -151,45 +151,45 @@ class People{
 		//移动时增加道路计数器
 		var roadCount = Rdcount.none;
 		if (direct == Direct.west){
-			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].roadwest, Rdcount.increase, Rdcount.none, Rdcount.max);
-			mapMain.data.cells[this.data.posX][this.data.posY].roadwest = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].roadeast = roadCount;
+			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdW, Rdcount.increase, Rdcount.none, Rdcount.max);
+			mapMain.data.cells[this.data.posX][this.data.posY].rdW = roadCount;
+			mapMain.data.cells[tempPosX][tempPosY].rdE = roadCount;
 		}
 		else if (direct == Direct.east){
-			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].roadeast, Rdcount.increase, Rdcount.none, Rdcount.max);
-			mapMain.data.cells[this.data.posX][this.data.posY].roadeast = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].roadwest = roadCount;
+			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdE, Rdcount.increase, Rdcount.none, Rdcount.max);
+			mapMain.data.cells[this.data.posX][this.data.posY].rdE = roadCount;
+			mapMain.data.cells[tempPosX][tempPosY].rdW = roadCount;
 		}
 		else if (direct == Direct.north){
-			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].roadnorth, Rdcount.increase, Rdcount.none, Rdcount.max);
-			mapMain.data.cells[this.data.posX][this.data.posY].roadnorth = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].roadsouth = roadCount;
+			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdN, Rdcount.increase, Rdcount.none, Rdcount.max);
+			mapMain.data.cells[this.data.posX][this.data.posY].rdN = roadCount;
+			mapMain.data.cells[tempPosX][tempPosY].rdS = roadCount;
 		}
 		else if (direct == Direct.south){
-			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].roadsouth, Rdcount.increase, Rdcount.none, Rdcount.max);
-			mapMain.data.cells[this.data.posX][this.data.posY].roadsouth = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].roadnorth = roadCount;
+			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdS, Rdcount.increase, Rdcount.none, Rdcount.max);
+			mapMain.data.cells[this.data.posX][this.data.posY].rdS = roadCount;
+			mapMain.data.cells[tempPosX][tempPosY].rdN = roadCount;
 		}
 		
 		this.data.direct = direct;
-		mapMain.data.cells[this.data.posX][this.data.posY].peopleid = Peopleid.none;	//从旧单元格清除当前人物id
+		mapMain.data.cells[this.data.posX][this.data.posY].pId = PeopleId.none;	//从旧单元格清除当前人物id
 		this.data.posX = tempPosX;
 		this.data.posY = tempPosY;
-		mapMain.data.cells[this.data.posX][this.data.posY].peopleid = this.data.id;	//向新的单元格写入当前人物id
+		mapMain.data.cells[this.data.posX][this.data.posY].pId = this.data.id;	//向新的单元格写入当前人物id
 		
 		//记录新单元格信息，例如是否有食物
-		if (mapMain.data.cells[this.data.posX][this.data.posY].rescount != Rescount.none){
-			this.data.rescell.posX = this.data.posX;
-			this.data.rescell.posY = this.data.posY;
+		if (mapMain.data.cells[this.data.posX][this.data.posY].resCt != ResCount.none){
+			this.data.resCell.posX = this.data.posX;
+			this.data.resCell.posY = this.data.posY;
 		}
 	}
 
 	explore(){
 		//随机生成方向，来时的方向尽可能避免，权重值设为最小，走过的路尽量避免
-		var directWtWest = (this.data.direct==Direct.west)?(Rdcount.max*2):((this.data.direct==Direct.east)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].roadwest));
-		var directWtEast = (this.data.direct==Direct.east)?(Rdcount.max*2):((this.data.direct==Direct.west)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].roadeast));
-		var directWtNorth = (this.data.direct==Direct.north)?(Rdcount.max*2):((this.data.direct==Direct.south)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].roadnorth));
-		var directWtSouth = (this.data.direct==Direct.south)?(Rdcount.max*2):((this.data.direct==Direct.north)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].roadsouth));		
+		var directWtWest = (this.data.direct==Direct.west)?(Rdcount.max*2):((this.data.direct==Direct.east)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdW));
+		var directWtEast = (this.data.direct==Direct.east)?(Rdcount.max*2):((this.data.direct==Direct.west)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdE));
+		var directWtNorth = (this.data.direct==Direct.north)?(Rdcount.max*2):((this.data.direct==Direct.south)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdN));
+		var directWtSouth = (this.data.direct==Direct.south)?(Rdcount.max*2):((this.data.direct==Direct.north)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdS));		
 
 		this.move(directWtWest, directWtEast, directWtNorth, directWtSouth);
 	}
@@ -205,89 +205,89 @@ class People{
 	}
 	
 	collect(){
-		var collectThis = Math.min(mapMain.data.cells[this.data.posX][this.data.posY].rescount, this.data.collect);	//采集能力和该格子剩余量较小值
-		collectThis = Math.min(collectThis, Peopleresource.max-this.data.resource);	//前述较小值与储存空间余量较小值
-		this.data.resource += collectThis;
-		mapMain.data.cells[this.data.posX][this.data.posY].rescount -= collectThis;
-		this.data.rescollect += collectThis;
+		var collectThis = Math.min(mapMain.data.cells[this.data.posX][this.data.posY].resCt, this.data.collect);	//采集能力和该格子剩余量较小值
+		collectThis = Math.min(collectThis, PeopleResCt.max-this.data.resCt);	//前述较小值与储存空间余量较小值
+		this.data.resCt += collectThis;
+		mapMain.data.cells[this.data.posX][this.data.posY].resCt -= collectThis;
+		this.data.resCollect += collectThis;
 	}
 	
 	consume(){
-		//var resConsume = Math.min(this.data.consume, this.data.resource);
+		//var resConsume = Math.min(this.data.consume, this.data.resCt);
 		//仅当不在矿区的时候消耗食物，并且立刻回收一部分食物（不占用行动）
-		if (mapMain.data.cells[this.data.posX][this.data.posY].resource != Resource.food) {
-			if (mapMain.data.cells[this.data.posX][this.data.posY].cityculture == this.data.cityid) {	//在自己的疆域上
-				this.data.consume = Math.max(Peopleconsume.save, this.data.recycle);
+		if (mapMain.data.cells[this.data.posX][this.data.posY].resTp != ResType.food) {
+			if (mapMain.data.cells[this.data.posX][this.data.posY].cCult == this.data.cId) {	//在自己的疆域上
+				this.data.consume = Math.max(PeopleConsume.save, this.data.recycle);
 			}
 			else {
-				this.data.consume = Peopleconsume.max;
+				this.data.consume = PeopleConsume.max;
 			}
-			this.data.resource -= this.data.consume;
-			this.data.resconsume -= this.data.consume;
-			this.data.resource += this.data.recycle;
-			this.data.resrecycle += this.data.recycle;
+			this.data.resCt -= this.data.consume;
+			this.data.resConsume -= this.data.consume;
+			this.data.resCt += this.data.recycle;
+			this.data.resRecycle += this.data.recycle;
 		}
-		if (this.data.resource <= Peopleresource.none){	//没有食物了，死亡
+		if (this.data.resCt <= PeopleResCt.none){	//没有食物了，死亡
 			this.dead();
 		}	
 	}
 	
 	grow(){
 		this.data.age += 1;
-		if (getRandom(this.data.age, Peopleage.max+1) == Peopleage.max){	//年龄太大了，死亡
+		if (getRandom(this.data.age, PeopleAge.max+1) == PeopleAge.max){	//年龄太大了，死亡
 			this.dead();
 		}			
 	}
 	
 	dead(){
-		mapMain.data.cells[this.data.posX][this.data.posY].peopleid = Peopleid.none;
-		if (cityList[this.data.cityid] != null) {
-			var peoplel = cityList[this.data.cityid].data.peoplealivelist;
+		mapMain.data.cells[this.data.posX][this.data.posY].pId = PeopleId.none;
+		if (cityList[this.data.cId] != null) {
+			var peoplel = cityList[this.data.cId].data.pAliveList;
 			peoplel.splice(peoplel.indexOf(this.data.id), 1);
 		}
-		var peoplel = globalData.peoplealivelist;
+		var peoplel = glbData.pAliveList;
 		peoplel.splice(peoplel.indexOf(this.data.id), 1);
-		this.data.alive = Peoplealive.no;
+		this.data.alive = PeopleAlive.no;
 	}
 	
 	near(){
-		this.data.peopleNearList.nearwest = mapMain.data.cells[this.data.posX-1][this.data.posY].peopleid;
-		this.data.peopleNearList.neareast = mapMain.data.cells[this.data.posX+1][this.data.posY].peopleid;
-		this.data.peopleNearList.nearnorth = mapMain.data.cells[this.data.posX][this.data.posY-1].peopleid;
-		this.data.peopleNearList.nearsouth = mapMain.data.cells[this.data.posX][this.data.posY+1].peopleid;
+		this.data.pNearList.nrW = mapMain.data.cells[this.data.posX-1][this.data.posY].pId;
+		this.data.pNearList.nrE = mapMain.data.cells[this.data.posX+1][this.data.posY].pId;
+		this.data.pNearList.nrN = mapMain.data.cells[this.data.posX][this.data.posY-1].pId;
+		this.data.pNearList.nrS = mapMain.data.cells[this.data.posX][this.data.posY+1].pId;
 	}
 
 	getEnemy(){
-		this.data.combatdirect = Direct.none;
-		var peopleIdEnemy = Peopleid.none;
+		this.data.cbtDir = Direct.none;
+		var peopleIdEnemy = PeopleId.none;
 		
-		var directWtWest = (this.data.peopleNearList.nearwest!=Peopleid.none && peopleList[this.data.peopleNearList.nearwest].data.cityid != this.data.cityid)?1:0;
-		var directWtEast = (this.data.peopleNearList.neareast!=Peopleid.none && peopleList[this.data.peopleNearList.neareast].data.cityid != this.data.cityid)?1:0;
-		var directWtNorth = (this.data.peopleNearList.nearnorth!=Peopleid.none && peopleList[this.data.peopleNearList.nearnorth].data.cityid != this.data.cityid)?1:0;
-		var directWtSouth = (this.data.peopleNearList.nearsouth!=Peopleid.none && peopleList[this.data.peopleNearList.nearsouth].data.cityid != this.data.cityid)?1:0;
+		var directWtWest = (this.data.pNearList.nrW!=PeopleId.none && peopleList[this.data.pNearList.nrW].data.cId != this.data.cId)?1:0;
+		var directWtEast = (this.data.pNearList.nrE!=PeopleId.none && peopleList[this.data.pNearList.nrE].data.cId != this.data.cId)?1:0;
+		var directWtNorth = (this.data.pNearList.nrN!=PeopleId.none && peopleList[this.data.pNearList.nrN].data.cId != this.data.cId)?1:0;
+		var directWtSouth = (this.data.pNearList.nrS!=PeopleId.none && peopleList[this.data.pNearList.nrS].data.cId != this.data.cId)?1:0;
 		
 		var directRand = getRandom(0, directWtWest+directWtEast+directWtNorth+directWtSouth); //加权方式，求出最大权重和各个方向的权重
 		if (directRand < directWtWest){
-			peopleIdEnemy = this.data.peopleNearList.nearwest;
-			this.data.combatdirect = Direct.west;
+			peopleIdEnemy = this.data.pNearList.nrW;
+			this.data.cbtDir = Direct.west;
 			//console.log("----  COMBAT  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdEnemy].data.posX, peopleList[peopleIdEnemy].data.posY);
 		}
 		else if (directRand < directWtWest+directWtEast){
-			peopleIdEnemy = this.data.peopleNearList.neareast;
-			this.data.combatdirect = Direct.east;
+			peopleIdEnemy = this.data.pNearList.nrE;
+			this.data.cbtDir = Direct.east;
 			//console.log("----  COMBAT  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdEnemy].data.posX, peopleList[peopleIdEnemy].data.posY);
 		}
 		else if (directRand < directWtWest+directWtEast+directWtNorth){
-			peopleIdEnemy = this.data.peopleNearList.nearnorth;
-			this.data.combatdirect = Direct.north;
+			peopleIdEnemy = this.data.pNearList.nrN;
+			this.data.cbtDir = Direct.north;
 			//console.log("----  COMBAT  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdEnemy].data.posX, peopleList[peopleIdEnemy].data.posY);
 		}
 		else if (directRand < directWtWest+directWtEast+directWtNorth+directWtSouth){
-			peopleIdEnemy = this.data.peopleNearList.nearsouth;
-			this.data.combatdirect = Direct.south;
+			peopleIdEnemy = this.data.pNearList.nrS;
+			this.data.cbtDir = Direct.south;
 			//console.log("----  COMBAT  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdEnemy].data.posX, peopleList[peopleIdEnemy].data.posY);
 		}
@@ -296,36 +296,36 @@ class People{
 	}
 	
 	getFriend(){
-		this.data.feeddirect = Direct.none;
-		var peopleIdFriend = Peopleid.none;
+		this.data.feedDir = Direct.none;
+		var peopleIdFriend = PeopleId.none;
 		
-		var directWtWest = (this.data.peopleNearList.nearwest!=Peopleid.none && peopleList[this.data.peopleNearList.nearwest].data.cityid == this.data.cityid)?1:0;
-		var directWtEast = (this.data.peopleNearList.neareast!=Peopleid.none && peopleList[this.data.peopleNearList.neareast].data.cityid == this.data.cityid)?1:0;
-		var directWtNorth = (this.data.peopleNearList.nearnorth!=Peopleid.none && peopleList[this.data.peopleNearList.nearnorth].data.cityid == this.data.cityid)?1:0;
-		var directWtSouth = (this.data.peopleNearList.nearsouth!=Peopleid.none && peopleList[this.data.peopleNearList.nearsouth].data.cityid == this.data.cityid)?1:0;
+		var directWtWest = (this.data.pNearList.nrW!=PeopleId.none && peopleList[this.data.pNearList.nrW].data.cId == this.data.cId)?1:0;
+		var directWtEast = (this.data.pNearList.nrE!=PeopleId.none && peopleList[this.data.pNearList.nrE].data.cId == this.data.cId)?1:0;
+		var directWtNorth = (this.data.pNearList.nrN!=PeopleId.none && peopleList[this.data.pNearList.nrN].data.cId == this.data.cId)?1:0;
+		var directWtSouth = (this.data.pNearList.nrS!=PeopleId.none && peopleList[this.data.pNearList.nrS].data.cId == this.data.cId)?1:0;
 		
 		var directRand = getRandom(0, directWtWest+directWtEast+directWtNorth+directWtSouth); //加权方式，求出最大权重和各个方向的权重
 		if (directRand < directWtWest){
-			peopleIdFriend = this.data.peopleNearList.nearwest;
-			this.data.feeddirect = Direct.west;
+			peopleIdFriend = this.data.pNearList.nrW;
+			this.data.feedDir = Direct.west;
 			//console.log("----  FEED  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdFriend].data.posX, peopleList[peopleIdFriend].data.posY);
 		}
 		else if (directRand < directWtWest+directWtEast){
-			peopleIdFriend = this.data.peopleNearList.neareast;
-			this.data.feeddirect = Direct.east;
+			peopleIdFriend = this.data.pNearList.nrE;
+			this.data.feedDir = Direct.east;
 			//console.log("----  FEED  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdFriend].data.posX, peopleList[peopleIdFriend].data.posY);
 		}
 		else if (directRand < directWtWest+directWtEast+directWtNorth){
-			peopleIdFriend = this.data.peopleNearList.nearnorth;
-			this.data.feeddirect = Direct.north;
+			peopleIdFriend = this.data.pNearList.nrN;
+			this.data.feedDir = Direct.north;
 			//console.log("----  FEED  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdFriend].data.posX, peopleList[peopleIdFriend].data.posY);
 		}
 		else if (directRand < directWtWest+directWtEast+directWtNorth+directWtSouth){
-			peopleIdFriend = this.data.peopleNearList.nearsouth;
-			this.data.feeddirect = Direct.south;
+			peopleIdFriend = this.data.pNearList.nrS;
+			this.data.feedDir = Direct.south;
 			//console.log("----  FEED  ----");
 			//console.log(this.data.posX, this.data.posY, peopleList[peopleIdFriend].data.posX, peopleList[peopleIdFriend].data.posY);
 		}
@@ -345,47 +345,47 @@ class People{
 		
 		if (attackThis >= attackEnemy){
 			//记录比赛结果
-			this.data.combatcount += 1;
-			this.data.combatcountwin += 1;
-			peopleList[peopleIdEnemy].data.combatcount += 1;
+			this.data.cbtCt += 1;
+			this.data.cbtWn += 1;
+			peopleList[peopleIdEnemy].data.cbtCt += 1;
 			//胜者从败者随机得到食物
-			var resTransfer = getRandom(Math.min(Peopleresource.dying,peopleList[peopleIdEnemy].data.resource), 1+Math.min(Peopleresource.max-this.data.resource, peopleList[peopleIdEnemy].data.resource));
-			this.data.resource += resTransfer;
-			this.data.rescombat += resTransfer;
-			peopleList[peopleIdEnemy].data.resource -= resTransfer;
-			peopleList[peopleIdEnemy].data.rescombat -= resTransfer;
+			var resTransfer = getRandom(Math.min(PeopleResCt.dying,peopleList[peopleIdEnemy].data.resCt), 1+Math.min(PeopleResCt.max-this.data.resCt, peopleList[peopleIdEnemy].data.resCt));
+			this.data.resCt += resTransfer;
+			this.data.resCombat += resTransfer;
+			peopleList[peopleIdEnemy].data.resCt -= resTransfer;
+			peopleList[peopleIdEnemy].data.resCombat -= resTransfer;
 			//console.log("----  WIN   ----");
 			//console.log(resTransfer);
 		}
 		else {
 			//记录比赛结果
-			this.data.combatcount += 1;
-			peopleList[peopleIdEnemy].data.combatcount += 1;
-			peopleList[peopleIdEnemy].data.combatcountwin += 1;
+			this.data.cbtCt += 1;
+			peopleList[peopleIdEnemy].data.cbtCt += 1;
+			peopleList[peopleIdEnemy].data.cbtWn += 1;
 			//胜者从败者随机得到食物
-			var resTransfer = getRandom(Math.min(Peopleresource.dying, this.data.resource), 1+Math.min(Peopleresource.max-peopleList[peopleIdEnemy].data.resource, this.data.resource));
-			this.data.resource -= resTransfer;
-			this.data.rescombat -= resTransfer;			
-			peopleList[peopleIdEnemy].data.resource += resTransfer;
-			peopleList[peopleIdEnemy].data.rescombat += resTransfer;
+			var resTransfer = getRandom(Math.min(PeopleResCt.dying, this.data.resCt), 1+Math.min(PeopleResCt.max-peopleList[peopleIdEnemy].data.resCt, this.data.resCt));
+			this.data.resCt -= resTransfer;
+			this.data.resCombat -= resTransfer;			
+			peopleList[peopleIdEnemy].data.resCt += resTransfer;
+			peopleList[peopleIdEnemy].data.resCombat += resTransfer;
 			//console.log("----  LOSE  ----");
 			//console.log(resTransfer);
 		}
 		
-		globalData.combatMain += 1;
+		glbData.combatMain += 1;
 	}
 	
 	feed(peopleIdF){
 		var peopleIdFriend = peopleIdF;
 		
-		var resTransfer = Math.min(this.data.resource-Peopleresource.starve, Peopleresource.starve-peopleList[peopleIdFriend].data.resource);
-		this.data.resource -= resTransfer; 
-		peopleList[peopleIdFriend].data.resource += resTransfer;	
+		var resTransfer = Math.min(this.data.resCt-PeopleResCt.starve, PeopleResCt.starve-peopleList[peopleIdFriend].data.resCt);
+		this.data.resCt -= resTransfer; 
+		peopleList[peopleIdFriend].data.resCt += resTransfer;	
 	}
 		
 	update(day){
 		//偶尔出现城市消失但人还在的bug，强制人死亡
-		if (cityList[this.data.cityid] == null){
+		if (cityList[this.data.cId] == null){
 			this.dead();
 		}
 		
@@ -394,80 +394,80 @@ class People{
 		var peopleIdFriend = this.getFriend();
 		var peopleIdEnemy = this.getEnemy();
 
-		if (acted == 0 && peopleIdFriend != Peopleid.none && this.data.starve == Peoplestarve.no && peopleList[peopleIdFriend].data.resource < Peopleresource.dying)	//有队友并且处于濒死
+		if (acted == 0 && peopleIdFriend != PeopleId.none && this.data.starve == PeopleStarve.no && peopleList[peopleIdFriend].data.resCt < PeopleResCt.dying)	//有队友并且处于濒死
 		{
 			this.feed(peopleIdFriend);
 			acted = 1;
 		}
 		else {
-			this.data.feeddirect = Direct.none;
+			this.data.feedDir = Direct.none;
 		}
 		
-		if (acted == 0 && peopleIdEnemy != Peopleid.none && (this.data.resource < Peopleresource.standard || (this.data.resource < Peopleresource.enough && mapMain.data.cells[peopleList[peopleIdEnemy].data.posX][peopleList[peopleIdEnemy].data.posY].cityculture == this.data.cityid)) && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过（自己饥饿或者在自己境内）
+		if (acted == 0 && peopleIdEnemy != PeopleId.none && (this.data.resCt < PeopleResCt.standard || (this.data.resCt < PeopleResCt.enough && mapMain.data.cells[peopleList[peopleIdEnemy].data.posX][peopleList[peopleIdEnemy].data.posY].cCult == this.data.cId)) && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过（自己饥饿或者在自己境内）
 			this.combat(peopleIdEnemy);
 			acted = 1;
 		}
 		else {
-			this.data.combatdirect = Direct.none;
+			this.data.cbtDir = Direct.none;
 		}
 		//单独计算胜率
-		if (this.data.combatcount > 0){																									
-			this.data.combatrate = Math.floor(100*this.data.combatcountwin/this.data.combatcount);
+		if (this.data.cbtCt > 0){																									
+			this.data.cbtWR = Math.floor(100*this.data.cbtWn/this.data.cbtCt);
 		}
 		
 		if (acted == 0)	{//没有救济队友或者发动战争
-			if(this.data.starve == Peoplestarve.no){	//当处于非饥饿状态时
-				if (this.data.resource > Peopleresource.standard) {	//食物超过储存值时，主动把食物送回部落
-					if (Math.abs(this.data.posX - cityList[this.data.cityid].data.posX) <= cityList[this.data.cityid].data.citySize && Math.abs(this.data.posY - cityList[this.data.cityid].data.posY) <= cityList[this.data.cityid].data.citySize) {
-						var resUpload = this.data.resource - Peopleresource.standard;
-						this.data.resource -= resUpload;
-						cityList[this.data.cityid].data.resource += resUpload;
+			if(this.data.starve == PeopleStarve.no){	//当处于非饥饿状态时
+				if (this.data.resCt > PeopleResCt.standard) {	//食物超过储存值时，主动把食物送回部落
+					if (Math.abs(this.data.posX - cityList[this.data.cId].data.posX) <= cityList[this.data.cId].data.citySize && Math.abs(this.data.posY - cityList[this.data.cId].data.posY) <= cityList[this.data.cId].data.citySize) {
+						var resUpload = this.data.resCt - PeopleResCt.standard;
+						this.data.resCt -= resUpload;
+						cityList[this.data.cId].data.resCt += resUpload;
 						//保存采集位置到城市list里
-						if (this.data.rescell.posX != -1 && this.data.rescell.posY != -1) {
-							var rescelllist = cityList[this.data.cityid].data.rescelllist;
-							rescelllist.push({'posX':this.data.rescell.posX, 'posY':this.data.rescell.posY});
-							if (rescelllist.length > 10) {	//list太长了就删掉旧的
-								rescelllist.shift();
+						if (this.data.resCell.posX != -1 && this.data.resCell.posY != -1) {
+							var resCellList = cityList[this.data.cId].data.resCellList;
+							resCellList.push({'posX':this.data.resCell.posX, 'posY':this.data.resCell.posY});
+							if (resCellList.length > 10) {	//list太长了就删掉旧的
+								resCellList.shift();
 							}
 						}
 					}
 					else{
-						this.go(cityList[this.data.cityid].data.posX, cityList[this.data.cityid].data.posY);
+						this.go(cityList[this.data.cId].data.posX, cityList[this.data.cId].data.posY);
 					}
 				}
-				else if (this.data.resource > Peopleresource.starve){	//食物充足不饥饿时，探索
+				else if (this.data.resCt > PeopleResCt.starve){	//食物充足不饥饿时，探索
 					this.explore();
 				}
 				else {	//食物不足时，标记饥饿状态
-					this.data.starve = Peoplestarve.yes;
+					this.data.starve = PeopleStarve.yes;
 					this.explore();
 				}
 			}
 			else {	//当处于饥饿状态时
-				if (this.data.resource < Peopleresource.dying) {
-					if (Math.abs(this.data.posX - cityList[this.data.cityid].data.posX) <= cityList[this.data.cityid].data.citySize && Math.abs(this.data.posY - cityList[this.data.cityid].data.posY) <= cityList[this.data.cityid].data.citySize) {
-						var resDownload = Math.min(Peopleresource.standard - this.data.resource, cityList[this.data.cityid].data.resource);
-						this.data.resource += resDownload;
-						this.data.starve = Peoplestarve.no;
-						cityList[this.data.cityid].data.resource -= resDownload;
+				if (this.data.resCt < PeopleResCt.dying) {
+					if (Math.abs(this.data.posX - cityList[this.data.cId].data.posX) <= cityList[this.data.cId].data.citySize && Math.abs(this.data.posY - cityList[this.data.cId].data.posY) <= cityList[this.data.cId].data.citySize) {
+						var resDownload = Math.min(PeopleResCt.standard - this.data.resCt, cityList[this.data.cId].data.resCt);
+						this.data.resCt += resDownload;
+						this.data.starve = PeopleStarve.no;
+						cityList[this.data.cId].data.resCt -= resDownload;
 					}
 					else{
-						this.go(cityList[this.data.cityid].data.posX, cityList[this.data.cityid].data.posY);
+						this.go(cityList[this.data.cId].data.posX, cityList[this.data.cId].data.posY);
 					}
 				}
-				else if (this.data.resource < Peopleresource.enough) {
-					if (mapMain.data.cells[this.data.posX][this.data.posY].rescount != Rescount.none){	//当前格有食物，直接开采
+				else if (this.data.resCt < PeopleResCt.enough) {
+					if (mapMain.data.cells[this.data.posX][this.data.posY].resCt != ResCount.none){	//当前格有食物，直接开采
 						this.collect();
 					}
-					else if (this.data.rescell.posX >=0 && this.data.rescell.posY >=0 && (this.data.rescell.posX != this.data.posX || this.data.rescell.posY != this.data.posY)) {	//当前格没有食物，向记忆中上一个有食物的格子移动
-						this.go(this.data.rescell.posX, this.data.rescell.posY);
+					else if (this.data.resCell.posX >=0 && this.data.resCell.posY >=0 && (this.data.resCell.posX != this.data.posX || this.data.resCell.posY != this.data.posY)) {	//当前格没有食物，向记忆中上一个有食物的格子移动
+						this.go(this.data.resCell.posX, this.data.resCell.posY);
 					}
 					else {	//记忆中的格子也没有食物，只能重新探索
 						this.explore();
 					}
 				}
 				else {	//食物充足，标记非饥饿状态
-					this.data.starve = Peoplestarve.no;
+					this.data.starve = PeopleStarve.no;
 					this.explore();
 				}
 			}

@@ -1,14 +1,14 @@
 class Map{
 	//生成空白地图
 	constructor(size){
-		this.data = {'cellSize': 0, 'cells': null, 'dayNext':Daycity};
-		this.data.dayNext = getRandom(1, Daycity*2);
+		this.data = {'cellSize': 0, 'cells': null, 'dayNext':DayCity};
+		this.data.dayNext = getRandom(1, DayCity*2);
 		this.data.cellSize = size;
 		this.data.cells = new Array();
 		for (var i=0; i<size; i++){
 			this.data.cells[i] = new Array();
 			for (var j=0; j<size; j++){
-				this.data.cells[i][j] = {'terrain':Terrain.none, 'resource':Resource.none, 'rescount':Rescount.none, 'citybase':Citybase.none, 'cityculture':Cityid.none, 'cityid':Cityid.none, 'peopleid':Peopleid.none, 'roadwest':Rdcount.none, 'roadeast':Rdcount.none, 'roadnorth':Rdcount.none, 'roadsouth':Rdcount.none};
+				this.data.cells[i][j] = {'ter':Terrain.none, 'resTp':ResType.none, 'resCt':ResCount.none, 'cBase':CityBase.none, 'cCult':CityId.none, 'cId':CityId.none, 'pId':PeopleId.none, 'rdW':Rdcount.none, 'rdE':Rdcount.none, 'rdN':Rdcount.none, 'rdS':Rdcount.none};
 			}
 		}
 	}
@@ -18,16 +18,16 @@ class Map{
 		var size = this.data.cellSize;
 		for (var i=0; i<size; i++){
 			for (var j=0; j<size; j++){
-				this.data.cells[i][j].terrain = (Math.random()<ratioWater)?Terrain.water:Terrain.none;
+				this.data.cells[i][j].ter = (Math.random()<ratioWater)?Terrain.water:Terrain.none;
 			}
 		}
 		for (var i=0; i<size; i++){
-			this.data.cells[i][0].terrain = Terrain.water;
-			this.data.cells[i][size - 1].terrain = Terrain.water;
+			this.data.cells[i][0].ter = Terrain.water;
+			this.data.cells[i][size - 1].ter = Terrain.water;
 		}
 		for (var j=0; j<size; j++){
-			this.data.cells[0][j].terrain = Terrain.water;
-			this.data.cells[size - 1][j].terrain = Terrain.water;
+			this.data.cells[0][j].ter = Terrain.water;
+			this.data.cells[size - 1][j].ter = Terrain.water;
 		}
 	}
 	
@@ -38,7 +38,7 @@ class Map{
 		for (var i=0; i<size; i++){
 			this.data.cellsNew[i] = new Array();
 			for (var j=0; j<size; j++){
-				this.data.cellsNew[i][j] = {'terrain':Terrain.none};
+				this.data.cellsNew[i][j] = {'ter':Terrain.none};
 			}
 		}		
 		for (var i=1; i<size-1; i++){
@@ -46,18 +46,18 @@ class Map{
 				var sum = 0;
 				for (var k=Math.max(0, i-1); k<Math.min(size, i+2); k++){
 					for (var l=Math.max(0, j-1); l<Math.min(size, j+2); l++){
-						sum += this.data.cells[k][l].terrain;
+						sum += this.data.cells[k][l].ter;
 					}
 				}
-				//sum -= this.data.cells[i][j].terrain;
+				//sum -= this.data.cells[i][j].ter;
 				if (sum >= 5){
-					this.data.cellsNew[i][j].terrain = Terrain.water; 
+					this.data.cellsNew[i][j].ter = Terrain.water; 
 				}
 			}
 		}
 		for (var i=1; i<size-1; i++){
 			for (var j=1; j<size-1; j++){
-				this.data.cells[i][j].terrain = this.data.cellsNew[i][j].terrain;
+				this.data.cells[i][j].ter = this.data.cellsNew[i][j].ter;
 			}
 		}
 		this.data.cellsNew = null;
@@ -68,7 +68,7 @@ class Map{
 		var size = this.data.cellSize;
 		for (var i=0; i<size; i++){
 			for (var j=0; j<size; j++){
-				this.data.cells[i][j].resource = (this.data.cells[i][j].terrain==Terrain.none && Math.random()<ratioResource)?Resource.food:Resource.none;
+				this.data.cells[i][j].resTp = (this.data.cells[i][j].ter==Terrain.none && Math.random()<ratioResource)?ResType.food:ResType.none;
 			}
 		}
 	}
@@ -80,7 +80,7 @@ class Map{
 		for (var i=0; i<size; i++){
 			this.data.cellsNew[i] = new Array();
 			for (var j=0; j<size; j++){
-				this.data.cellsNew[i][j] = {'resource':Resource.none};
+				this.data.cellsNew[i][j] = {'resTp':ResType.none};
 			}
 		}		
 		for (var i=1; i<size-1; i++){
@@ -88,18 +88,18 @@ class Map{
 				var sum = 0;
 				for (var k=Math.max(0, i-1); k<Math.min(size, i+2); k++){
 					for (var l=Math.max(0, j-1); l<Math.min(size, j+2); l++){
-						sum += this.data.cells[k][l].resource;
+						sum += this.data.cells[k][l].resTp;
 					}
 				}
-				//sum -= this.data.cells[i][j].terrain;
-				if (this.data.cells[i][j].terrain == 0 && sum >= 5){
-					this.data.cellsNew[i][j].resource = Resource.food; 
+				//sum -= this.data.cells[i][j].ter;
+				if (this.data.cells[i][j].ter == 0 && sum >= 5){
+					this.data.cellsNew[i][j].resTp = ResType.food; 
 				}
 			}
 		}
 		for (var i=1; i<size-1; i++){
 			for (var j=1; j<size-1; j++){
-				this.data.cells[i][j].resource = this.data.cellsNew[i][j].resource;
+				this.data.cells[i][j].resTp = this.data.cellsNew[i][j].resTp;
 			}
 		}		
 		this.data.cellsNew = null;
@@ -110,7 +110,7 @@ class Map{
 		var size = this.data.cellSize;
 		for (var i=0; i<size; i++){
 			for (var j=0; j<size; j++){
-				this.data.cells[i][j].rescount = (this.data.cells[i][j].resource == Resource.food)?Rescount.max:0;
+				this.data.cells[i][j].resCt = (this.data.cells[i][j].resTp == ResType.food)?ResCount.max:0;
 			}
 		}
 	}
@@ -132,52 +132,52 @@ class Map{
 	update(day){
 		var size = this.data.cellSize;
 		//更新资源
-		if (day % Dayfoodreborn == 0){
+		if (day % DayResReborn == 0){
 			for (var i=0; i<size; i++){
 				for (var j=0; j<size-1; j++){
-					if (this.data.cells[i][j].resource == Resource.food){
-						this.data.cells[i][j].rescount = increase(this.data.cells[i][j].rescount, Rescount.reborn, Rescount.none, Rescount.max);
+					if (this.data.cells[i][j].resTp == ResType.food){
+						this.data.cells[i][j].resCt = increase(this.data.cells[i][j].resCt, ResCount.reborn, ResCount.none, ResCount.max);
 					}
 				}
 			}
 		}
 		//更新道路
-		if (day % Dayroad == 0){	//每隔一段时间就把道路的计数器减一
+		if (day % DayRoad == 0){	//每隔一段时间就把道路的计数器减一
 			for (var i=1; i<size-1; i++){
 				for (var j=1; j<size-1; j++){
-					this.data.cells[i][j].roadwest = decrease(this.data.cells[i][j].roadwest, Rdcount.decrease, Rdcount.none, Rdcount.max);
-					this.data.cells[i][j].roadeast = decrease(this.data.cells[i][j].roadeast, Rdcount.decrease, Rdcount.none, Rdcount.max);
-					this.data.cells[i][j].roadnorth = decrease(this.data.cells[i][j].roadnorth, Rdcount.decrease, Rdcount.none, Rdcount.max);
-					this.data.cells[i][j].roadsouth = decrease(this.data.cells[i][j].roadsouth, Rdcount.decrease, Rdcount.none, Rdcount.max);
+					this.data.cells[i][j].rdW = decrease(this.data.cells[i][j].rdW, Rdcount.decrease, Rdcount.none, Rdcount.max);
+					this.data.cells[i][j].rdE = decrease(this.data.cells[i][j].rdE, Rdcount.decrease, Rdcount.none, Rdcount.max);
+					this.data.cells[i][j].rdN = decrease(this.data.cells[i][j].rdN, Rdcount.decrease, Rdcount.none, Rdcount.max);
+					this.data.cells[i][j].rdS = decrease(this.data.cells[i][j].rdS, Rdcount.decrease, Rdcount.none, Rdcount.max);
 				}
 			}
 		}
 		//更新文化
-		if (day % Dayculture == 0){
+		if (day % DayCulture == 0){
 			for (var i=1; i<size-1; i++){
 				for (var j=0; j<size-1; j++){
-					if (this.data.cells[i][j].peopleid != Peopleid.none && this.data.cells[i][j].resource == Resource.none) {	//如果有人经过空地
-						var people = peopleList[this.data.cells[i][j].peopleid];
-						var city = cityList[people.data.cityid];
+					if (this.data.cells[i][j].pId != PeopleId.none && this.data.cells[i][j].resTp == ResType.none) {	//如果有人经过空地
+						var people = peopleList[this.data.cells[i][j].pId];
+						var city = cityList[people.data.cId];
 						var sum = 0;
 						for (var k=Math.max(0, i-1); k<Math.min(size, i+2); k++){
 							for (var l=Math.max(0, j-1); l<Math.min(size, j+2); l++){
-								sum += this.data.cells[k][l].cityculture==city.data.id?1:0;
+								sum += this.data.cells[k][l].cCult==city.data.id?1:0;
 							}
 						}
 						if (sum >= 3){
-							this.data.cells[i][j].cityculture = city.data.id;
+							this.data.cells[i][j].cCult = city.data.id;
 						}
 					}
 				}
 			}			
 		}
 		//生成新城市
-		if (day >= this.data.dayNext && globalData.cityalivelist.length < CityNumMax) {
-			var city = new City(Citysize.small);
-			if (city.data.id != Cityid.none){	//成功生成
+		if (day >= this.data.dayNext && glbData.cAliveList.length < CityNumMax) {
+			var city = new City(CitySize.small);
+			if (city.data.id != CityId.none){	//成功生成
 				cityList.push(city);
-				this.data.dayNext = day + getRandom(1, Daycity*2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+				this.data.dayNext = day + getRandom(1, DayCity*2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 			}	
 		}
 	}
