@@ -1,14 +1,14 @@
 class Map{
 	//生成空白地图
 	constructor(size){
-		this.data = {'cellSize': 0, 'cells': null, 'dayNext':DayCity};
-		this.data.dayNext = getRandom(1, DayCity*2);
+		this.data = {'cellSize': 0, 'cells': null, 'dayCityNext':DayCity};
+		this.data.dayCityNext = getRandom(1, DayCity*2);
 		this.data.cellSize = size;
 		this.data.cells = new Array();
 		for (var i=0; i<size; i++){
 			this.data.cells[i] = new Array();
 			for (var j=0; j<size; j++){
-				this.data.cells[i][j] = {'ter':Terrain.none, 'resTp':ResType.none, 'resCt':ResCount.none, 'cBase':CityBase.none, 'cCult':CityId.none, 'cId':CityId.none, 'pId':PeopleId.none, 'rdW':Rdcount.none, 'rdE':Rdcount.none, 'rdN':Rdcount.none, 'rdS':Rdcount.none};
+				this.data.cells[i][j] = {'ter':Terrain.none, 'resTp':ResType.none, 'resCt':ResCount.none, 'cBase':CityBase.none, 'cCult':CityCult.none, 'cId':CityId.none, 'pId':PeopleId.none, 'rdW':Rdcount.none, 'rdE':Rdcount.none, 'rdN':Rdcount.none, 'rdS':Rdcount.none};
 			}
 		}
 	}
@@ -162,23 +162,24 @@ class Map{
 						var sum = 0;
 						for (var k=Math.max(0, i-1); k<Math.min(size, i+2); k++){
 							for (var l=Math.max(0, j-1); l<Math.min(size, j+2); l++){
-								sum += this.data.cells[k][l].cCult==city.data.id?1:0;
+								sum += this.data.cells[k][l].cCult==city.data.cult?1:0;
 							}
 						}
 						if (sum >= 3){
-							this.data.cells[i][j].cCult = city.data.id;
+							this.data.cells[i][j].cCult = city.data.cult;
 						}
 					}
 				}
 			}			
 		}
 		//生成新城市
-		if (day >= this.data.dayNext && glbData.cAliveList.length < CityNumMax) {
-			var city = new City(CitySize.small);
+		/* TODO:测试由城市生成新城市
+		if (day >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {
+			var city = new City(CitySize.small, CityCult.none);
 			if (city.data.id != CityId.none){	//成功生成
 				cityList.push(city);
-				this.data.dayNext = day + getRandom(1, DayCity*2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+				this.data.dayCityNext = day + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 			}	
-		}
+		}TODO--*/
 	}
 }

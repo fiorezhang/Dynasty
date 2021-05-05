@@ -1,12 +1,13 @@
 class People{
 	static idStatic = 0;
 	
-	constructor(cId, resourceborn){
+	constructor(cId, cCult, resBorn){
 		this.data = {	'alive':PeopleAlive.no, 
 						'posX':0, 
 						'posY':0, 
 						'cId':cId, 
-						'resCt':resourceborn, 
+						'cCult':cCult, 
+						'resCt':resBorn, 
 						'power':0, 
 						'collect':0, 
 						'recycle':0, 
@@ -37,11 +38,11 @@ class People{
 
 		this.data.consume = PeopleConsume.max;	//TODO:应该设计成消耗大于（不等于）回收
 
-		this.data.collect = getRandom(1, PeopleCollect.max);
-		this.data.recycle = getRandom(1, PeopleRecycle.max);
-		this.data.power = getRandom(1, PeoplePower.max);
+		this.data.collect = PeopleCollect.min;//getRandom(1, PeopleCollect.max);
+		this.data.recycle = PeopleRecycle.min;//getRandom(1, PeopleRecycle.max);
+		this.data.power = PeoplePower.min;//getRandom(1, PeoplePower.max);
 
-		//console.log(this.data.power, this.data.cbtCt, this.data.cbtWn);
+		//console.log(this.data.collect, this.data.recycle, this.data.power);
 		
 		//随机生成居民
 		var countRetry = 0;		
@@ -87,6 +88,11 @@ class People{
 		glbData.pAliveList.push(this.data.id);
 	}
 	
+	upgrade() {
+		this.data.collect = Math.min(this.data.collect + (getRandom(1, PeopleAge.max)<PeopleCollect.max?1:0), PeopleCollect.max-1);
+		this.data.recycle = Math.min(this.data.recycle + (getRandom(1, PeopleAge.max)<PeopleRecycle.max?1:0), PeopleRecycle.max-1);
+		this.data.power = Math.min(this.data.power + (getRandom(1, PeopleAge.max)<PeoplePower.max?1:0), PeoplePower.max-1);
+	}
 
 	move(weightWest, weightEast, weightNorth, weightSouth){
 		var countRetry = 0;		
@@ -216,7 +222,7 @@ class People{
 		//var resConsume = Math.min(this.data.consume, this.data.resCt);
 		//仅当不在矿区的时候消耗食物，并且立刻回收一部分食物（不占用行动）
 		if (mapMain.data.cells[this.data.posX][this.data.posY].resTp != ResType.food) {
-			if (mapMain.data.cells[this.data.posX][this.data.posY].cCult == this.data.cId) {	//在自己的疆域上
+			if (mapMain.data.cells[this.data.posX][this.data.posY].cCult == this.data.cCult) {	//在自己的疆域上
 				this.data.consume = Math.max(PeopleConsume.save, this.data.recycle);
 			}
 			else {
@@ -261,10 +267,10 @@ class People{
 		this.data.cbtDir = Direct.none;
 		var peopleIdEnemy = PeopleId.none;
 		
-		var directWtWest = (this.data.pNearList.nrW!=PeopleId.none && peopleList[this.data.pNearList.nrW].data.cId != this.data.cId)?1:0;
-		var directWtEast = (this.data.pNearList.nrE!=PeopleId.none && peopleList[this.data.pNearList.nrE].data.cId != this.data.cId)?1:0;
-		var directWtNorth = (this.data.pNearList.nrN!=PeopleId.none && peopleList[this.data.pNearList.nrN].data.cId != this.data.cId)?1:0;
-		var directWtSouth = (this.data.pNearList.nrS!=PeopleId.none && peopleList[this.data.pNearList.nrS].data.cId != this.data.cId)?1:0;
+		var directWtWest = (this.data.pNearList.nrW!=PeopleId.none && peopleList[this.data.pNearList.nrW].data.cCult != this.data.cCult)?1:0;
+		var directWtEast = (this.data.pNearList.nrE!=PeopleId.none && peopleList[this.data.pNearList.nrE].data.cCult != this.data.cCult)?1:0;
+		var directWtNorth = (this.data.pNearList.nrN!=PeopleId.none && peopleList[this.data.pNearList.nrN].data.cCult != this.data.cCult)?1:0;
+		var directWtSouth = (this.data.pNearList.nrS!=PeopleId.none && peopleList[this.data.pNearList.nrS].data.cCult != this.data.cCult)?1:0;
 		
 		var directRand = getRandom(0, directWtWest+directWtEast+directWtNorth+directWtSouth); //加权方式，求出最大权重和各个方向的权重
 		if (directRand < directWtWest){
@@ -299,10 +305,10 @@ class People{
 		this.data.feedDir = Direct.none;
 		var peopleIdFriend = PeopleId.none;
 		
-		var directWtWest = (this.data.pNearList.nrW!=PeopleId.none && peopleList[this.data.pNearList.nrW].data.cId == this.data.cId)?1:0;
-		var directWtEast = (this.data.pNearList.nrE!=PeopleId.none && peopleList[this.data.pNearList.nrE].data.cId == this.data.cId)?1:0;
-		var directWtNorth = (this.data.pNearList.nrN!=PeopleId.none && peopleList[this.data.pNearList.nrN].data.cId == this.data.cId)?1:0;
-		var directWtSouth = (this.data.pNearList.nrS!=PeopleId.none && peopleList[this.data.pNearList.nrS].data.cId == this.data.cId)?1:0;
+		var directWtWest = (this.data.pNearList.nrW!=PeopleId.none && peopleList[this.data.pNearList.nrW].data.cCult == this.data.cCult)?1:0;
+		var directWtEast = (this.data.pNearList.nrE!=PeopleId.none && peopleList[this.data.pNearList.nrE].data.cCult == this.data.cCult)?1:0;
+		var directWtNorth = (this.data.pNearList.nrN!=PeopleId.none && peopleList[this.data.pNearList.nrN].data.cCult == this.data.cCult)?1:0;
+		var directWtSouth = (this.data.pNearList.nrS!=PeopleId.none && peopleList[this.data.pNearList.nrS].data.cCult == this.data.cCult)?1:0;
 		
 		var directRand = getRandom(0, directWtWest+directWtEast+directWtNorth+directWtSouth); //加权方式，求出最大权重和各个方向的权重
 		if (directRand < directWtWest){
@@ -389,6 +395,8 @@ class People{
 			this.dead();
 		}
 		
+		this.upgrade();
+		
 		var acted = 0;	//本回合是否行动过（移动，战斗，挖矿，转移矿才算行动）
 		this.near();
 		var peopleIdFriend = this.getFriend();
@@ -403,7 +411,7 @@ class People{
 			this.data.feedDir = Direct.none;
 		}
 		
-		if (acted == 0 && peopleIdEnemy != PeopleId.none && (this.data.resCt < PeopleResCt.standard || (this.data.resCt < PeopleResCt.enough && mapMain.data.cells[peopleList[peopleIdEnemy].data.posX][peopleList[peopleIdEnemy].data.posY].cCult == this.data.cId)) && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过（自己饥饿或者在自己境内）
+		if (acted == 0 && peopleIdEnemy != PeopleId.none && (this.data.resCt < PeopleResCt.standard || (this.data.resCt < PeopleResCt.enough && mapMain.data.cells[peopleList[peopleIdEnemy].data.posX][peopleList[peopleIdEnemy].data.posY].cCult == this.data.cCult)) && this.data.power > peopleList[peopleIdEnemy].data.power){	//有敌人且觉得打得过（自己饥饿或者在自己境内）
 			this.combat(peopleIdEnemy);
 			acted = 1;
 		}

@@ -69,7 +69,7 @@ function load(){
 		City.idStatic = 0;
 		cityList = new Array();
 		for (var i=0; i<savedgame.cityl.length; i++){
-			var city = new City(CitySize.none);
+			var city = new City(CitySize.none, null);
 			if (savedgame.cityl[i] != null) {
 				city.data = savedgame.cityl[i].data;
 			}
@@ -79,7 +79,7 @@ function load(){
 		People.idStatic = 0;
 		peopleList = new Array();
 		for (var i=0; i<savedgame.peoplel.length; i++){
-			var people = new People(CityId.none);
+			var people = new People(CityId.none, null);
 			if (savedgame.peoplel[i] != null) {
 				people.data = savedgame.peoplel[i].data;
 			}

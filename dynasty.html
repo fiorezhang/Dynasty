@@ -94,19 +94,18 @@ var ResCount = {'none':0, 'reborn':1, 'max':20};
 var CityAlive = {'no':0, 'yes':1};
 var CityBase = {'none':0, 'reserve':1, 'zone':2, 'center':3};
 var CityId = {'none':-1}; 
+var CityCult = {'none':-1};
 var CitySize = {'none':0, 'small':1, 'middle':2, 'big':3};
-var CityResCt = {'none':0, 'small':10000, 'middle':40000, 'big':160000};
+var CityResCt = {'none':0, 'small':10000, 'middle':30000, 'big':90000};
 
 var PeopleAlive = {'no':0, 'yes':1};
 var PeopleId = {'none':-1};
-var PeopleResCt = {'none':0, 'dying':100, 'starve':500, 'standard':1200, 'enough':1800, 'max':2000};
-var PeopleCollect = {'none':0, 'max':10};
-var PeopleRecycle = {'none':0, 'max':10};
-var PeopleConsume = {'none':0, 'save':5, 'max':10};
+var PeopleResCt = {'none':0, 'dying':100, 'starve':500, 'standard':1000, 'enough':1800, 'max':2000};
+var PeoplePower = {'none':0, 'min':1, 'max':10};
+var PeopleCollect = {'none':0, 'min':1, 'max':10};
+var PeopleRecycle = {'none':0, 'min':1, 'max':10};
+var PeopleConsume = {'none':0, 'min':1, 'save':5, 'max':10};
 var PeopleStarve = {'no':0, 'yes':1};
-
-var PeoplePower = {'none':0, 'max':10};
-
 var PeopleAge = {'none':0, 'max':10000};
 
 var Direct = {'none':0, 'west':1, 'east':2, 'north':3, 'south':4};
@@ -121,10 +120,10 @@ var DayPeople = 100;
 var DayCity = 1000;
 var DayCulture = 1;
 
-var CityNumMax = 40;
+var CityNumMax = 100;
 var PeopleNumIndex = 10;
 
-var MapWaterSeed = 0.42;
+var MapWaterSeed = 0.43;
 var MapWaterLoop = 15;
 var MapResourceSeed = 0.44;
 var MapResourceLoop = 10;
@@ -140,7 +139,7 @@ var glbData = {	'consoleLog':0,
 				'pAliveList':null, 
 				'combatMain':0, //战争计数器
 				'mapCellSize':10, 	//地图尺寸，N x N的方格地图
-				'cityNum':10, 	//初始生成多少个城市
+				'cityNum':20, 	//初始生成多少个城市
 				'peopleNumCity':0,	//每个城市初始生成多少个人
 				'ageAverage':0,	//平均寿命
 				'foodCount':0, 	//野外总矿数
@@ -205,12 +204,12 @@ function initNewMap(){
 
 	//生成城市，以增量方式存放在list里面，list为了保证可索引必须唯一
 	for (var i=0; i<glbData.cityNum; i++){
-		var city = new City(CitySize.small);
+		var city = new City(CitySize.small, CityCult.none);
 		if (city.data.id != CityId.none){
 			cityList.push(city);
 			//生成初始人口，以增量方式存放在list里面，所有的人口放在同一个list且list必须唯一
 			for (var j=0; j<glbData.peopleNumCity; j++){
-				var people = new People(city.data.id, PeopleResCt.standard);
+				var people = new People(city.data.id, city.data.cult, PeopleResCt.standard);
 				if (people.data.id != PeopleId.none){
 					peopleList.push(people);
 				}				

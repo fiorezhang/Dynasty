@@ -31,15 +31,15 @@ function drawCells(){
 			//绘制城市
 			if (mapMain.data.cells[i][j].cBase == CityBase.zone){
 				var city = cityList[mapMain.data.cells[i][j].cId];
-				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
+				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.cult);
 				contextMap.fillRect(i*cellSide, j*cellSide, cellSide, cellSide);
-				contextMap.fillStyle="white";
-				contextMap.fillRect(i*cellSide+2, j*cellSide+2, cellSide-4, cellSide-4);	//城市其它格子，空心颜色
+				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
+				contextMap.fillRect(i*cellSide+2, j*cellSide+2, cellSide-4, cellSide-4);	//城市其它格子，中心颜色代表ID
 			}
 			if (mapMain.data.cells[i][j].cBase == CityBase.center){
 				var city = cityList[mapMain.data.cells[i][j].cId];
 				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
-				contextMap.fillRect(i*cellSide, j*cellSide, cellSide, cellSide);	//城市中心格子，实心颜色
+				contextMap.fillRect(i*cellSide+2, j*cellSide+2, cellSide-4, cellSide-4);	//城市中心格子，实心颜色
 			}		
 			//绘制人
 			if (mapMain.data.cells[i][j].pId != PeopleId.none){
@@ -57,9 +57,9 @@ function drawCells(){
 				contextMap.fill();
 			}			
 			//绘制文化
-			if (mapMain.data.cells[i][j].cCult != CityId.none){
+			if (mapMain.data.cells[i][j].cCult != CityCult.none){
 				var city = cityList[mapMain.data.cells[i][j].cCult];
-				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
+				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.cult);
 				if (glbData.consoleLog == 1) {
 					contextMap.fillRect(i*cellSide+cellSide/2-1, j*cellSide+cellSide/2-1, 2, 2);
 				}
@@ -139,10 +139,10 @@ function showHighlight() {
 			contextMap.fillRect(posPeopleX*cellSide, (posPeopleY+1)*cellSide-1, cellSide, 1);
 			contextMap.fillRect((posPeopleX+1)*cellSide-1, posPeopleY*cellSide, 1, cellSide);	
 		}
-		contextMap.fillStyle=getSeededRandomColor(32,255,city.data.id);
+		contextMap.fillStyle=getSeededRandomColor(32,255,city.data.cult);
 		for (var i=0; i<glbData.mapCellSize; i++){
 			for (var j=0; j<glbData.mapCellSize; j++){
-				if (mapMain.data.cells[i][j].cCult == city.data.id) {
+				if (mapMain.data.cells[i][j].cCult == city.data.cult) {
 					contextMap.fillRect(i*cellSide+cellSide/2-1, j*cellSide+cellSide/2-1, 2, 2);
 				}
 			}
@@ -171,7 +171,7 @@ function showStatus() {
 	if (glbData.hltPeopleId != PeopleId.none && peopleList[glbData.hltPeopleId] != null){
 		document.getElementById("coord").innerHTML = "坐标： " + peopleList[glbData.hltPeopleId].data.posX + " , " + peopleList[glbData.hltPeopleId].data.posY;
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].resCt;	
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult != CityId.none?cityList[mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult].data.fmName:"-");	
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult != CityCult.none?cityList[mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult].data.fmName:"-");	
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("store").innerHTML = "储备";
 		document.getElementById("citizen").innerHTML = "人口";
@@ -189,7 +189,7 @@ function showStatus() {
 	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cBase == CityBase.center){
 		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltPosX.toString() + " " + glbData.hltPosY.toString();
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].resCt;
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult != CityId.none?cityList[mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult].data.fmName:"-");
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult].data.fmName:"-");
 		document.getElementById("cityname").innerHTML = "城市： " + cityList[glbData.hltCityId].data.fmName;
 		document.getElementById("store").innerHTML = "储备： " + cityList[glbData.hltCityId].data.resCt;
 		document.getElementById("citizen").innerHTML = "人口： " + cityList[glbData.hltCityId].data.pAliveList.length;
@@ -207,7 +207,7 @@ function showStatus() {
 	else{
 		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltPosX.toString() + " " + glbData.hltPosY.toString();
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].resCt;	
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult != CityId.none?cityList[mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult].data.fmName:"-");
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cCult].data.fmName:"-");
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("store").innerHTML = "储备";
 		document.getElementById("citizen").innerHTML = "人口";
@@ -250,17 +250,23 @@ function showTable() {
 		//----
 	}
 	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cBase == CityBase.center){
-		var city = cityList[glbData.hltCityId];
-		//----
-		tab+="<tr>";
-		tab+="<td class=\"left_city\">" + city.data.id + "</td>";														//ID
-		tab+="<td>" + city.data.fmName + "</td>";																//城市
-		tab+="<td>" + city.data.pAliveList.length + "</td>";													//人口
-		tab+="<td>" + city.data.citySize + "</td>";																	//等级
-		tab+="<td>" + city.data.resCt + "</td>";																	//储备
-		tab+="<td>" + city.data.territory + "</td>";																//疆域
-		tab+="</tr>";
-		//----		
+		var showMax = TableRowMax;	//最多显示多少行
+		for (var i=0; i<cityList.length && showMax>0; i++) {	
+			if (cityList[i] != null && cityList[i].data.cult == cityList[glbData.hltCityId].data.cult) {
+				showMax -= 1;
+				var city = cityList[i];
+				//----
+				tab+="<tr>";
+				tab+="<td class=\"left_city\">" + city.data.id + "</td>";														//ID
+				tab+="<td>" + city.data.fmName + "</td>";																//城市
+				tab+="<td>" + city.data.pAliveList.length + "</td>";													//人口
+				tab+="<td>" + city.data.citySize + "</td>";																	//等级
+				tab+="<td>" + city.data.resCt + "</td>";																	//储备
+				tab+="<td>" + city.data.territory + "</td>";																//疆域
+				tab+="</tr>";
+				//----		
+			}
+		}
 	}
 	else {
 		var showMax = TableRowMax;	//最多显示多少行
