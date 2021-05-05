@@ -120,7 +120,7 @@ var DayPeople = 100;
 var DayCity = 1000;
 var DayCulture = 1;
 
-var CityNumMax = 100;
+var CityNumMax = 60;
 var PeopleNumIndex = 10;
 
 var MapWaterSeed = 0.43;
@@ -228,6 +228,7 @@ function initNewMap(){
 	//Canavas画出来
 	drawCells();	
 	showHighlight();
+	drawDebug();
 }
 
 
@@ -294,6 +295,7 @@ function stepCa(){
 	showTable();	//显示表格
     drawCells();	//画格子
 	showHighlight();//高亮
+	drawDebug();
 	glbData.dayMain += 1;	//天数+1
 }
 
@@ -335,6 +337,7 @@ canavasMap.onmousedown = function(ev) {
 	showTable();
 	drawCells();
 	showHighlight();
+	drawDebug();
 	
 	canavasMap.onmouseup = function(){
 		document.onmouseup = null;

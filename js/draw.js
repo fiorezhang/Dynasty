@@ -60,8 +60,8 @@ function drawCells(){
 			if (mapMain.data.cells[i][j].cCult != CityCult.none){
 				var city = cityList[mapMain.data.cells[i][j].cCult];
 				contextMap.fillStyle=getSeededRandomColor(32,255,city.data.cult);
-				if (glbData.consoleLog == 1) {
-					contextMap.fillRect(i*cellSide+cellSide/2-1, j*cellSide+cellSide/2-1, 2, 2);
+				if (glbData.consoleLog == 1) {	//仅限调试模式，绘制全疆域
+					contextMap.fillRect(i*cellSide+1, j*cellSide+1, cellSide-2, cellSide-2);
 				}
 				if (i>=1 && mapMain.data.cells[i][j].cCult != mapMain.data.cells[i-1][j].cCult){
 					contextMap.fillRect(i*cellSide, (j+1/4)*cellSide, 1, cellSide/2);
@@ -116,6 +116,31 @@ function drawCells(){
 			}
         }
     }
+}
+
+function drawDebug() {
+	//仅限调试模式，绘制全疆域
+	if (glbData.consoleLog == 1) {
+		var cellSide = Math.round(windowSizeMap / glbData.mapCellSize); //边长
+		//var cellRadius = Math.round(windowSizeMap / glbData.mapCellSize / 2);
+		for (var i=0; i<glbData.mapCellSize; i++){
+			for (var j=0; j<glbData.mapCellSize; j++){				
+				if (mapMain.data.cells[i][j].cCult != CityCult.none){
+					var city = cityList[mapMain.data.cells[i][j].cCult];
+					contextMap.fillStyle=getSeededRandomColor(32,255,city.data.cult);
+					contextMap.fillRect(i*cellSide+1, j*cellSide+1, cellSide-2, cellSide-2);
+				}
+			}
+		}
+		for (var i=0; i<cityList.length; i++) {
+			var city = cityList[i];
+			if (city != null && city.data.id == city.data.cult) {	//主城
+				contextMap.font="80px Arial";
+				contextMap.fillStyle="black";
+				contextMap.fillText(city.data.fmName, (city.data.posX-4)*cellSide, (city.data.posY+4)*cellSide);//字写到主城中心
+			}
+		}
+	}
 }
 
 function showHighlight() {

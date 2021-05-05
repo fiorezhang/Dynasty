@@ -19,8 +19,19 @@ class City{
 			cityConflict = 0;
 			this.data.posX = getRandom(0+cityBoundary, mapMain.data.cellSize-cityBoundary);
 			this.data.posY = getRandom(0+cityBoundary, mapMain.data.cellSize-cityBoundary);
-			//console.log(this.data.posX);
-			//console.log(this.data.posY);
+			
+			//限定新生成分城的位置
+			if (culture != CityCult.none && culture != null){
+				var cityMainId = culture;
+				var cityMain = cityList[cityMainId];
+				if (cityMain != null){
+					var distance = Math.ceil(Math.sqrt(cityMain.data.territory));
+					this.data.posX = getRandom(Math.max(0, cityMain.data.posX-distance)+cityBoundary, Math.min(mapMain.data.cellSize, cityMain.data.posX+distance)-cityBoundary);
+					this.data.posY = getRandom(Math.max(0, cityMain.data.posY-distance)+cityBoundary, Math.min(mapMain.data.cellSize, cityMain.data.posY+distance)-cityBoundary);
+				}
+			}
+			
+			//console.log("RETRY", culture, this.data.posX, this.data.posY);
 
 			for (var i=-cityBoundary; i<=cityBoundary; i++){
 				for (var j=-cityBoundary; j<=cityBoundary; j++){
@@ -36,7 +47,7 @@ class City{
 			countRetry += 1;
 		}while(cityConflict == 1 && countRetry < maxRetry);		
 		
-		//console.log(countRetry, this.data.posX, this.data.posY);
+		//console.log("DONE", countRetry, this.data.posX, this.data.posY);
 		
 		if (countRetry >= maxRetry){
 			this.data.id = CityId.none;
@@ -51,12 +62,27 @@ class City{
 		//console.log(this.data.id);		
 		if (culture == CityCult.none || culture == null) {
 			this.data.cult = this.data.id;
-			this.data.fmName = getFamilyName();
+			var nameConflict = 0;
+			countRetry = 0;
+			maxRetry = 10;
+			do{
+				nameConflict = 0;
+				this.data.fmName = getFamilyName();
+				for (var i=0; i<cityList.length; i++) {
+					var city = cityList[i];
+					if (city != null && city.data.fmName == this.data.fmName){
+						nameConflict = 1;
+						break;
+					}
+				}
+				countRetry += 1;
+			}while(nameConflict == 1 && countRetry < maxRetry);
 		}
 		else {
 			this.data.cult = culture;
 			var cityMainId = this.data.cult; //文化ID和主城ID相同
-			this.data.fmName = cityList[cityMainId].data.fmName;
+			var cityMain = cityList[cityMainId];
+			this.data.fmName = cityMain.data.fmName;
 		}
 		
 		this.data.dayCityNext = getRandom(DayCity/2, DayCity*3/2);
