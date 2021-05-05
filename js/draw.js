@@ -135,9 +135,11 @@ function drawDebug() {
 		for (var i=0; i<cityList.length; i++) {
 			var city = cityList[i];
 			if (city != null && city.data.id == city.data.cult) {	//主城
-				contextMap.font="80px Arial";
+				contextMap.font="80px KaiTi";
+				contextMap.textAlign="center";
+				contextMap.textBaseline="middle";
 				contextMap.fillStyle="black";
-				contextMap.fillText(city.data.fmName, (city.data.posX-4)*cellSide, (city.data.posY+4)*cellSide);//字写到主城中心
+				contextMap.fillText(city.data.fmName, city.data.posX*cellSide, city.data.posY*cellSide);//字写到主城中心
 			}
 		}
 	}
