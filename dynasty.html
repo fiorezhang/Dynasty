@@ -86,6 +86,8 @@
 <script>
 // -- MAIN --
 //常量变量定义+
+var Debug = {'consoleLog':1, 'fastMode':2, 'mapMode':4, 'recordMap':8};
+
 var Terrain = {'none':0, 'water':1};
 
 var ResType = {'none':0, 'food':1};
@@ -129,10 +131,12 @@ var MapResourceSeed = 0.44;
 var MapResourceLoop = 10;
 
 var TableRowMax = 5000;
+
+var DayRecordMap = 100;
 //常量变量定义-
 
 //全局变量，存档时需要保存
-var glbData = {	'consoleLog':0,
+var glbData = {	'debug':0,
 				'secondCycle':1, 
 				'dayMain':0,	//记录回合数（天数），地图资源等按照一定天数间隔刷新，人物按照天数为最小单位来决定行动（更新状态机）
 				'cAliveList':null,
@@ -152,7 +156,7 @@ var glbData = {	'consoleLog':0,
 			};			
 
 //调试接口
-glbData.consoleLog = document.getElementById("debug").value;
+glbData.debug = document.getElementById("debug").value;
 
 //单步循环间隔
 glbData.secondCycle = document.getElementById("speed").value;
@@ -218,7 +222,7 @@ function initNewMap(){
 	}
 	
 	//打印所有信息，可以关掉
-	if (glbData.consoleLog == 1){
+	if ((glbData.debug & Debug.consoleLog) > 0){
 		console.log(glbData);
 		console.log(mapMain);
 		console.log(cityList);
@@ -228,7 +232,8 @@ function initNewMap(){
 	//Canavas画出来
 	drawCells();	
 	showHighlight();
-	drawDebug();
+	drawMapMode();
+	recordMap();
 }
 
 
@@ -275,7 +280,7 @@ function updateAll(){
 
 //单步更新所有游戏元素的状态，包括地图，城市，人口等等
 function stepCa(){
-	glbData.consoleLog = document.getElementById("debug").value;
+	glbData.debug = document.getElementById("debug").value;
 	glbData.secondCycle = document.getElementById("speed").value;
 	
 	if (glbData.secondCycle <= 0){
@@ -283,7 +288,7 @@ function stepCa(){
 	}
 
 	//打印所有信息，可以关掉
-	if (glbData.consoleLog == 1){
+	if ((glbData.debug & Debug.consoleLog) > 0){
 		console.log(glbData);
 		console.log(mapMain);
 		console.log(cityList);
@@ -295,7 +300,8 @@ function stepCa(){
 	showTable();	//显示表格
     drawCells();	//画格子
 	showHighlight();//高亮
-	drawDebug();
+	drawMapMode();
+	recordMap();
 	glbData.dayMain += 1;	//天数+1
 }
 
@@ -337,7 +343,8 @@ canavasMap.onmousedown = function(ev) {
 	showTable();
 	drawCells();
 	showHighlight();
-	drawDebug();
+	drawMapMode();
+	recordMap();
 	
 	canavasMap.onmouseup = function(){
 		document.onmouseup = null;
