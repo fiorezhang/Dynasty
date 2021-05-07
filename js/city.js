@@ -11,7 +11,7 @@ class City{
 
 		//随机生成城市中心点，预留最大城市范围，碰撞检测是否与湖，资源，其它城市重叠
 		var countRetry = 0;		
-		var maxRetry = 1000;
+		var maxRetry = 100;
 		var cityConflict = 0;
 		var cityBoundary = CitySize.big + 1;
 		//var cityBoundary = CitySize.big;
@@ -175,6 +175,9 @@ class City{
 				cityList.push(city);
 				this.data.resCt -= CityResCt.small;//主城减去分城的初始资源
 				this.data.dayCityNext = day + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+			}
+			else {
+				this.data.dayCityNext = day + getRandom(DayCityFail/2, DayCityFail*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 			}
 			//console.log(this.data.id, this.data.dayCityNext);
 		}			

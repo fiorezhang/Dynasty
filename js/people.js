@@ -98,12 +98,12 @@ class People{
 		var countRetry = 0;		
 		var maxRetry = 20;
 		var moveConflict = 0;
-		var tempPosX = 0;
-		var tempPosY = 0;
+		var temp = {'posX':0, 'posY':0};
+
 		do{
 			moveConflict = 0;
-			tempPosX = this.data.posX;
-			tempPosY = this.data.posY;
+			temp.posX = this.data.posX;
+			temp.posY = this.data.posY;
 			var direct = Direct.none;
 			var directWtWest = weightWest;
 			var directWtEast = weightEast;
@@ -112,35 +112,35 @@ class People{
 			var directRand = getRandom(0, directWtWest+directWtEast+directWtNorth+directWtSouth); //加权方式，求出最大权重和各个方向的权重
 			if (directRand < directWtWest){
 				direct = Direct.west;
-				tempPosX -= 1;
+				temp.posX -= 1;
 				//console.log("WEST");
 			}
 			else if (directRand < directWtWest+directWtEast){
 				direct = Direct.east;
-				tempPosX += 1;
+				temp.posX += 1;
 				//console.log("EAST");
 			}
 			else if (directRand < directWtWest+directWtEast+directWtNorth){
 				direct = Direct.north;
-				tempPosY -= 1;
+				temp.posY -= 1;
 				//console.log("NORTH");
 			}
 			else if (directRand < directWtWest+directWtEast+directWtNorth+directWtSouth){
 				direct = Direct.south;
-				tempPosY += 1;
+				temp.posY += 1;
 				//console.log("SOUTH");
 			}
 			
-			if (mapMain.data.cells[tempPosX][tempPosY].ter == Terrain.water || mapMain.data.cells[tempPosX][tempPosY].pId != PeopleId.none){
+			if (mapMain.data.cells[temp.posX][temp.posY].ter == Terrain.water || mapMain.data.cells[temp.posX][temp.posY].pId != PeopleId.none){
 				moveConflict = 1;
 				//console.log("water or people");
 			}
-			else if (mapMain.data.cells[tempPosX][tempPosY].cId > CityId.none){
-				if (mapMain.data.cells[tempPosX][tempPosY].cId != this.data.cId){	//当碰撞检测到别的城市时
+			else if (mapMain.data.cells[temp.posX][temp.posY].cId > CityId.none){
+				if (mapMain.data.cells[temp.posX][temp.posY].cId != this.data.cId){	//当碰撞检测到别的城市时
 					moveConflict = 1;
 					//console.log("other city");
 				}
-				else if(mapMain.data.cells[tempPosX][tempPosY].cBase == CityBase.center){	//当碰撞检测到本方城市中心时
+				else if(mapMain.data.cells[temp.posX][temp.posY].cBase == CityBase.center){	//当碰撞检测到本方城市中心时
 					moveConflict = 1;
 					//console.log("own city");
 				}
@@ -159,28 +159,28 @@ class People{
 		if (direct == Direct.west){
 			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdW, Rdcount.increase, Rdcount.none, Rdcount.max);
 			mapMain.data.cells[this.data.posX][this.data.posY].rdW = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].rdE = roadCount;
+			mapMain.data.cells[temp.posX][temp.posY].rdE = roadCount;
 		}
 		else if (direct == Direct.east){
 			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdE, Rdcount.increase, Rdcount.none, Rdcount.max);
 			mapMain.data.cells[this.data.posX][this.data.posY].rdE = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].rdW = roadCount;
+			mapMain.data.cells[temp.posX][temp.posY].rdW = roadCount;
 		}
 		else if (direct == Direct.north){
 			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdN, Rdcount.increase, Rdcount.none, Rdcount.max);
 			mapMain.data.cells[this.data.posX][this.data.posY].rdN = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].rdS = roadCount;
+			mapMain.data.cells[temp.posX][temp.posY].rdS = roadCount;
 		}
 		else if (direct == Direct.south){
 			roadCount = increase(mapMain.data.cells[this.data.posX][this.data.posY].rdS, Rdcount.increase, Rdcount.none, Rdcount.max);
 			mapMain.data.cells[this.data.posX][this.data.posY].rdS = roadCount;
-			mapMain.data.cells[tempPosX][tempPosY].rdN = roadCount;
+			mapMain.data.cells[temp.posX][temp.posY].rdN = roadCount;
 		}
 		
 		this.data.direct = direct;
 		mapMain.data.cells[this.data.posX][this.data.posY].pId = PeopleId.none;	//从旧单元格清除当前人物id
-		this.data.posX = tempPosX;
-		this.data.posY = tempPosY;
+		this.data.posX = temp.posX;
+		this.data.posY = temp.posY;
 		mapMain.data.cells[this.data.posX][this.data.posY].pId = this.data.id;	//向新的单元格写入当前人物id
 		
 		//记录新单元格信息，例如是否有食物

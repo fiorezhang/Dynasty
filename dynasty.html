@@ -17,7 +17,7 @@
 <div style="float:left;">
 <div id=console1>
 <b style="width:150px; height:50px; font-size:20px;">速度</b>
-<input type="text" id="speed" value="0.1" style="width:200px; height:40px; font-size:20px"></input>
+<input type="text" id="speed" value="0.01" style="width:200px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">尺寸</b>
 <input type="text" id="size" value="150" style="width:200px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">调试</b>
@@ -86,7 +86,7 @@
 <script>
 // -- MAIN --
 //常量变量定义+
-var Debug = {'consoleLog':1, 'fastMode':2, 'mapMode':4, 'recordMap':8};
+var Debug = {'consoleLog':1, 'mapMode':2, 'recordMap':4};
 
 var Terrain = {'none':0, 'water':1};
 
@@ -120,14 +120,15 @@ var DayResReborn = 2;
 var DayRoad = 1;
 var DayPeople = 100;
 var DayCity = 1000;
+var DayCity = 100;
 var DayCulture = 1;
 
 var CityNumMax = 60;
-var PeopleNumIndex = 10;
+var PeopleNumIndex = 8;
 
-var MapWaterSeed = 0.43;
+var MapWaterSeed = 0.42;
 var MapWaterLoop = 15;
-var MapResourceSeed = 0.44;
+var MapResourceSeed = 0.43;
 var MapResourceLoop = 10;
 
 var TableRowMax = 5000;
@@ -147,8 +148,7 @@ var glbData = {	'debug':0,
 				'peopleNumCity':0,	//每个城市初始生成多少个人
 				'ageAverage':0,	//平均寿命
 				'foodCount':0, 	//野外总矿数
-				'hltPosX':0, //鼠标焦点
-				'hltPosY':0, 
+				'hltPoint':{'posX':0, 'posY':0}, //鼠标焦点
 				'hltPeopleId':PeopleId.none,
 				'hltCityId':CityId.none,
 				'excelCity':null,	//绘制表格时的句柄，每次新建实例前要销毁前一个实例
@@ -334,10 +334,10 @@ canavasMap.onmousedown = function(ev) {
 	contextMap.moveTo(offsetX,offsetY);
 	
 	//探测到当前鼠标点下的posX,posY
-	glbData.hltPosX = posX;
-	glbData.hltPosY = posY;
-	glbData.hltPeopleId = mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].pId;
-	glbData.hltCityId = mapMain.data.cells[glbData.hltPosX][glbData.hltPosY].cId;
+	glbData.hltPoint.posX = posX;
+	glbData.hltPoint.posY = posY;
+	glbData.hltPeopleId = mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].pId;
+	glbData.hltCityId = mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cId;
 
 	showStatus();
 	showTable();
