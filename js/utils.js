@@ -61,8 +61,8 @@ function save(){
 
 //读档
 function load(){
-	console.log(localStorage.getItem("save"));
 	var savedgame = JSON.parse(localStorage.getItem("dynasty"));
+	console.log(localStorage.getItem("dynasty"));
 	if (savedgame != null && savedgame != undefined){
 		glbData = savedgame.global;
 		
