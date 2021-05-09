@@ -2,7 +2,7 @@ class Map{
 	//生成空白地图
 	constructor(size){
 		this.data = {'cellSize': 0, 'cells': null, 'dayCityNext':DayCity};
-		this.data.dayCityNext = getRandom(1, DayCity*2);
+		this.data.dayCityNext = getRandom(DayCity/2, DayCity*3/2);
 		this.data.cellSize = size;
 		this.data.cells = new Array();
 		for (var i=0; i<size; i++){
@@ -129,10 +129,10 @@ class Map{
 	}
 	
 	//每日更新
-	update(day){
+	update(){
 		var size = this.data.cellSize;
 		//更新资源
-		if (day % DayResReborn == 0){
+		if (glbData.dayMain % DayResReborn == 0){
 			for (var i=0; i<size; i++){
 				for (var j=0; j<size-1; j++){
 					if (this.data.cells[i][j].resTp == ResType.food){
@@ -142,7 +142,7 @@ class Map{
 			}
 		}
 		//更新道路
-		if (day % DayRoad == 0){	//每隔一段时间就把道路的计数器减一
+		if (glbData.dayMain % DayRoad == 0){	//每隔一段时间就把道路的计数器减一
 			for (var i=1; i<size-1; i++){
 				for (var j=1; j<size-1; j++){
 					this.data.cells[i][j].rdW = decrease(this.data.cells[i][j].rdW, Rdcount.decrease, Rdcount.none, Rdcount.max);
@@ -153,7 +153,7 @@ class Map{
 			}
 		}
 		//更新文化
-		if (day % DayCulture == 0){
+		if (glbData.dayMain % DayCulture == 0){
 			for (var i=1; i<size-1; i++){
 				for (var j=0; j<size-1; j++){
 					if (this.data.cells[i][j].pId != PeopleId.none && this.data.cells[i][j].resTp == ResType.none) {	//如果有人经过空地
@@ -174,11 +174,11 @@ class Map{
 		}
 		//生成新城市
 		/* TODO:测试由城市生成新城市
-		if (day >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {
+		if (glbData.dayMain >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {
 			var city = new City(CitySize.small, CityCult.none);
 			if (city.data.id != CityId.none){	//成功生成
 				cityList.push(city);
-				this.data.dayCityNext = day + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+				this.data.dayCityNext = glbData.dayMain + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 			}	
 		}TODO--*/
 	}

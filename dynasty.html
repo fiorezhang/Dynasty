@@ -48,6 +48,7 @@
 </div>
 <div  id=console2>
 <b id="cityname" style="width:150px; height:50px; font-size:20px;">城市</b><br>
+<b id="citycult" style="width:150px; height:50px; font-size:20px;">文化</b><br>
 <b id="citylevel" style="width:150px; height:50px; font-size:20px;">等级</b><br>
 <b id="citizen" style="width:150px; height:50px; font-size:20px;">人口</b><br>
 <b id="store" style="width:150px; height:50px; font-size:20px;">储备</b><br>
@@ -73,6 +74,10 @@
 <div id=console3>
 <table id="table_people"> 
 </table> 
+</div>
+<div id=console3>
+<textarea id="biography" rows="21" cols="84">
+</textarea>
 </div>
 </div>
 
@@ -106,7 +111,7 @@ var PeopleResCt = {'none':0, 'dying':100, 'starve':500, 'standard':1000, 'enough
 var PeoplePower = {'none':0, 'min':1, 'max':10};
 var PeopleCollect = {'none':0, 'min':1, 'max':10};
 var PeopleRecycle = {'none':0, 'min':1, 'max':10};
-var PeopleConsume = {'none':0, 'min':1, 'save':5, 'max':10};
+var PeopleConsume = {'none':0, 'min':1, 'save':9, 'max':10};
 var PeopleStarve = {'no':0, 'yes':1};
 var PeopleAge = {'none':0, 'max':10000};
 
@@ -119,6 +124,7 @@ var Combatwin = {'no':0, 'yes':1};
 var DayResReborn = 2;
 var DayRoad = 1;
 var DayPeople = 100;
+var DayPeopleUpgrade = 12;
 var DayCity = 1000;
 var DayCityFail = 100;
 var DayCulture = 1;
@@ -128,7 +134,7 @@ var PeopleNumIndex = 8;
 
 var MapWaterSeed = 0.42;
 var MapWaterLoop = 15;
-var MapResourceSeed = 0.43;
+var MapResourceSeed = 0.44;
 var MapResourceLoop = 10;
 
 var TableRowMax = 5000;
@@ -153,6 +159,7 @@ var glbData = {	'debug':0,
 				'hltCityId':CityId.none,
 				'excelCity':null,	//绘制表格时的句柄，每次新建实例前要销毁前一个实例
 				'excelPeople':null,
+				'bio':"",
 			};			
 
 //调试接口
@@ -198,6 +205,9 @@ function initNewMap(){
 	
 	//战争数归零
 	glbData.combatMain = 0;
+	
+	//传记归零
+	glbData.bio = "";
 
 	//根据输入确定地图尺寸
 	glbData.mapCellSize = document.getElementById("size").value;
@@ -239,7 +249,7 @@ function initNewMap(){
 
 function updateAll(){
 	//每回合更新地图
-	mapMain.update(glbData.dayMain);
+	mapMain.update();
 	glbData.foodCount = 0;
 	for (var i=0; i<glbData.mapCellSize; i++){
         for (var j=0; j<glbData.mapCellSize; j++){
@@ -253,7 +263,7 @@ function updateAll(){
 	//每回合更新各个城市，顺便统计数据
 	for (var i=0; i<cityList.length; i++){
 		if (cityList[i] != null && cityList[i].data.alive == CityAlive.yes){
-			cityList[i].update(glbData.dayMain);
+			cityList[i].update();
 		}
 		else{
 			cityList[i] = null;	//为节省空间，当实例作废后，标记成null
@@ -264,7 +274,7 @@ function updateAll(){
 	var ageSum = 0;
 	for (var i=0; i<peopleList.length; i++){
 		if (peopleList[i] != null && peopleList[i].data.alive == PeopleAlive.yes){
-			peopleList[i].update(glbData.dayMain);
+			peopleList[i].update();
 			ageSum += peopleList[i].data.age;
 		}
 		else{

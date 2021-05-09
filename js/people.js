@@ -29,6 +29,7 @@ class People{
 						'resCollect':0,
 						'resRecycle':0,
 						'resConsume':0,
+						'dayUpgradeNext':DayPeopleUpgrade,
 						};
 
 		if (cId == CityId.none){	//专门设计给读档
@@ -74,6 +75,7 @@ class People{
 		People.idStatic += 1;
 		this.data.fmName = cityList[this.data.cId].data.fmName;
 		this.data.gvName = getGivenName();
+		this.data.dayUpgradeNext = getRandom(DayPeopleUpgrade/2, DayPeopleUpgrade*3/2);
 		
 		//从城市信息获取资源格位置
 		var resCellList = cityList[this.data.cId].data.resCellList;
@@ -89,9 +91,34 @@ class People{
 	}
 	
 	upgrade() {
-		this.data.collect = Math.min(this.data.collect + (getRandom(1, PeopleAge.max)<PeopleCollect.max?1:0), PeopleCollect.max-1);
-		this.data.recycle = Math.min(this.data.recycle + (getRandom(1, PeopleAge.max)<PeopleRecycle.max?1:0), PeopleRecycle.max-1);
-		this.data.power = Math.min(this.data.power + (getRandom(1, PeopleAge.max)<PeoplePower.max?1:0), PeoplePower.max-1);
+		var city = cityList[this.data.cId];
+		if (city != null && glbData.dayMain >= this.data.dayUpgradeNext) {
+			if (this.data.collect != PeopleCollect.max-1) {
+				var upgradeToday = getRandom(1, this.data.age)<PeopleCollect.max?1:0;
+				this.data.collect = Math.min(this.data.collect + upgradeToday, PeopleCollect.max-1);
+				if (this.data.collect == PeopleCollect.max-1 && this.data.recycle == PeopleRecycle.max-1 && this.data.power == PeoplePower.max-1) {
+					addBio("【"+city.data.fmName+"】家族【"+city.data.cityName+"】城《"+this.data.fmName+this.data.gvName+"》能力满级。");
+				}
+			}
+			
+			if (this.data.recycle != PeopleRecycle.max-1) {
+				var upgradeToday = getRandom(1, this.data.age)<PeopleRecycle.max?1:0;
+				this.data.recycle = Math.min(this.data.recycle + upgradeToday, PeopleRecycle.max-1);
+				if (this.data.collect == PeopleCollect.max-1 && this.data.recycle == PeopleRecycle.max-1 && this.data.power == PeoplePower.max-1) {
+					addBio("【"+city.data.fmName+"】家族【"+city.data.cityName+"】城《"+this.data.fmName+this.data.gvName+"》能力满级。");
+				}
+			}			
+			
+			if (this.data.power != PeoplePower.max-1) {
+				var upgradeToday = getRandom(1, this.data.age)<PeoplePower.max?1:0;
+				this.data.power = Math.min(this.data.power + upgradeToday, PeoplePower.max-1);
+				if (this.data.collect == PeopleCollect.max-1 && this.data.recycle == PeopleRecycle.max-1 && this.data.power == PeoplePower.max-1) {
+					addBio("【"+city.data.fmName+"】家族【"+city.data.cityName+"】城《"+this.data.fmName+this.data.gvName+"》能力满级。");
+				}
+			}
+			
+			this.data.dayUpgradeNext = glbData.dayMain + getRandom(DayPeopleUpgrade/2, DayPeopleUpgrade*3/2);
+		}
 	}
 
 	move(weightWest, weightEast, weightNorth, weightSouth){
@@ -389,7 +416,7 @@ class People{
 		peopleList[peopleIdFriend].data.resCt += resTransfer;	
 	}
 		
-	update(day){
+	update(){
 		//偶尔出现城市消失但人还在的bug，强制人死亡
 		if (cityList[this.data.cId] == null){
 			this.dead();

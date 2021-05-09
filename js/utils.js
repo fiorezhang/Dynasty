@@ -16,6 +16,21 @@ function decrease(value, step, min, max){
 	return temp;
 }
 
+var  saveFile =  function (data, filename){
+     var  save_link = document.createElementNS( 'http://www.w3.org/1999/xhtml' ,  'a' );
+     save_link.href = data;
+     save_link.download = filename;
+   
+     var  event = document.createEvent( 'MouseEvents' );
+     event.initMouseEvent( 'click' ,  true ,  false , window, 0, 0, 0, 0, 0,  false ,  false ,  false ,  false , 0,  null );
+     save_link.dispatchEvent(event);
+};
+   
+function PrefixInteger(num, length) {
+	return ( "0000000000000000" + num ).substr( -length );
+}
+
+
 //随机生成m到n-1整数
 function getRandom(m, n){
 	return Math.floor(Math.random()*(n-m)+m);
@@ -65,6 +80,7 @@ function load(){
 	console.log(localStorage.getItem("dynasty"));
 	if (savedgame != null && savedgame != undefined){
 		glbData = savedgame.global;
+		loadBio();
 		
 		City.idStatic = 0;
 		cityList = new Array();
@@ -88,6 +104,22 @@ function load(){
 
 		mapMain.data = savedgame.map.data;
 	}
+}
+
+function getCityName() {
+	var cityNames = new Array(
+	'大都', '蓟城', '幽州', '涿郡', '幽都', '永安', '宛平', '燕山', '圣都', '中都', '大兴', '北平', '顺天', '京师', '金陵', '建业', 
+	'建康', '江宁', '临安', '钱塘', '武林', '姑苏', '吴郡', '平江', '淮上', '江都', '广陵', '淮扬', '会稽', '蠡城', '越州', '长安', 
+	'京兆', '奉元', '西京', '大梁', '汴梁', '汴州', '东京', '汴京', '雒阳', '斟鄩', '洛邑', '洛州', '京洛', '东洛', '司隶', '三川', 
+	'盛京', '奉天', '锦官', '益州', '三山', '江陵', '郢都', '虔州', '虔城', '宋城', '星城', '潭州', '津沽', '津门', '邺城', '磁州', 
+	'洺州', '大名', '广平', '汝南', '琅琊', '沂州', '九原', '常山', '幽州', '上谷', '保州', '靴城', '保府', '兰陵', '庐州', '徽州', 
+	'新安', '歙州', '云中', '渝州', '琴川', '永嘉', '颛臾', '沔阳', '庐陵', '平阳', '尧都', '河东', '当涂', '月港', '葭县', '夷陵', 
+	'建宁', '槠洲', '漾泉', '长平', '澶渊', '醴泉', '广济', '均州', '郧阳', '襄阳', '武陵', '张垣', '浔阳', '朝歌', '陈仓', '凤翔', 
+	'桐丘', '海洲', '沙洲', '婺州', '赢牟', '嘉应', '登州', '榆次', '毗陵', '京口', '上党', '骈邑', '颍州', '海曲', '晋阳', '明州', 
+	'静海', '梁溪', '金匮', '登瀛', '鸣沙', '宝安', '邕州', '饶州', '下相', '钟吾', '归绥', '颍川', '巨鹿', '马陵', 
+	);
+	var index = getRandom(0, cityNames.length);
+	return cityNames[index];
 }
 
 function getFamilyName() {

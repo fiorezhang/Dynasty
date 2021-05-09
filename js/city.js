@@ -2,7 +2,7 @@ class City{
 	static idStatic = 0;
 	
 	constructor(size, culture){
-		this.data = {'posX':0, 'posY':0, 'alive':CityAlive.no, 'resCt':0, 'dayCityNext':DayCity, 'dayPeopleNext':DayPeople, 'citySize':0, 'id':CityId.none, 'cult':CityCult.none, 'fmName':'', 'territory':0, 'pAliveList':null, 'resCellList':null};
+		this.data = {'posX':0, 'posY':0, 'alive':CityAlive.no, 'resCt':0, 'dayCityNext':DayCity, 'dayPeopleNext':DayPeople, 'citySize':0, 'id':CityId.none, 'cult':CityCult.none, 'fmName':'', 'cityName':'', 'territory':0, 'pAliveList':null, 'resCellList':null};
 		
 		if (size == CitySize.none){	//专门设计给读档
 			City.idStatic += 1;
@@ -85,6 +85,22 @@ class City{
 			this.data.fmName = cityMain.data.fmName;
 		}
 		
+		var nameConflict = 0;
+		countRetry = 0;
+		maxRetry = 10;
+		do{
+			nameConflict = 0;
+			this.data.cityName = getCityName();
+			for (var i=0; i<cityList.length; i++) {
+				var city = cityList[i];
+				if (city != null && city.data.cityName == this.data.cityName){
+					nameConflict = 1;
+					break;
+				}
+			}
+			countRetry += 1;
+		}while(nameConflict == 1 && countRetry < maxRetry);
+		
 		this.data.dayCityNext = getRandom(DayCity/2, DayCity*3/2);
 		this.data.dayPeopleNext = getRandom(DayPeople/2, DayPeople*3/2);
 		
@@ -120,6 +136,8 @@ class City{
 		this.data.resCellList = new Array();
 		
 		glbData.cAliveList.push(this.data.id);
+		
+		addBio("【"+this.data.fmName+"】家族建城【"+this.data.cityName+"】城。");
 	}
 	
 	dead(){
@@ -140,26 +158,28 @@ class City{
 		var cityl = glbData.cAliveList;
 		cityl.splice(cityl.indexOf(this.data.id), 1);
 		this.data.alive = CityAlive.no;
+		
+		addBio("【"+this.data.fmName+"】家族【"+this.data.cityName+"】城消亡。")
 	}
 	
-	update(day){
+	update(){
 		var peopleBorn = 0;	//标记是否本轮生成市民
 		//间隔一段时间，如果有足够资源，生成新的市民
-		if (day >= this.data.dayPeopleNext && this.data.pAliveList.length < PeopleNumIndex * this.data.citySize && this.data.resCt >= PeopleResCt.starve) {	//城市容纳人数为8x城市大小
+		if (glbData.dayMain >= this.data.dayPeopleNext && this.data.pAliveList.length < PeopleNumIndex * this.data.citySize && this.data.resCt >= PeopleResCt.starve) {	//城市容纳人数为8x城市大小
 			var resourceBorn = Math.min(this.data.resCt, PeopleResCt.standard);
 			var people = new People(this.data.id, this.data.cult, resourceBorn);
 			if (people.data.id != PeopleId.none){	//成功生成
 				peopleBorn = 1;
 				peopleList.push(people);
 				this.data.resCt -= resourceBorn;
-				this.data.dayPeopleNext = day + getRandom(DayPeople/2, DayPeople*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+				this.data.dayPeopleNext = glbData.dayMain + getRandom(DayPeople/2, DayPeople*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 			}	
 		}
 		
 		//生成新分城市
 		var cityBorn = 0;	
 		//符合条件时，主城生成新的城市
-		if (this.data.id == this.data.cult && day >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {	//主城
+		if (this.data.id == this.data.cult && glbData.dayMain >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {	//主城
 			var city = null;
 			var cityBornResCt = CityResCt.none;
 			if (this.data.citySize == CitySize.middle && this.data.resCt > CityResCt.middle + CityResCt.small) { //中城而且资源足够，分城后不会立刻降级
@@ -174,10 +194,10 @@ class City{
 				cityBorn = 1;
 				cityList.push(city);
 				this.data.resCt -= CityResCt.small;//主城减去分城的初始资源
-				this.data.dayCityNext = day + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+				this.data.dayCityNext = glbData.dayMain + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 			}
 			else {
-				this.data.dayCityNext = day + getRandom(DayCityFail/2, DayCityFail*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+				this.data.dayCityNext = glbData.dayMain + getRandom(DayCityFail/2, DayCityFail*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 			}
 			//console.log(this.data.id, this.data.dayCityNext);
 		}			
@@ -208,18 +228,22 @@ class City{
 		if (this.data.citySize == CitySize.small && this.data.resCt > CityResCt.middle) {
 			this.data.citySize = CitySize.middle;
 			citySizeChange = 1;
+			addBio("【"+this.data.fmName+"】家族【"+this.data.cityName+"】城升级中级城市。");
 		}
 		if (this.data.citySize == CitySize.middle && this.data.resCt > CityResCt.big) {
 			this.data.citySize = CitySize.big;
 			citySizeChange = 1;
+			addBio("【"+this.data.fmName+"】家族【"+this.data.cityName+"】城升级高级城市。");
 		}
 		if (this.data.citySize == CitySize.middle && this.data.resCt < CityResCt.small) {
 			this.data.citySize = CitySize.small;
 			citySizeChange = 1;
+			addBio("【"+this.data.fmName+"】家族【"+this.data.cityName+"】城降级初级城市。");
 		}
 		if (this.data.citySize == CitySize.big && this.data.resCt < CityResCt.middle) {
 			this.data.citySize = CitySize.middle;
 			citySizeChange = 1;
+			addBio("【"+this.data.fmName+"】家族【"+this.data.cityName+"】城降级中级城市。");
 		}		
 		if (citySizeChange == 1) {
 			for (var i=-CitySize.big; i<=CitySize.big; i++){
