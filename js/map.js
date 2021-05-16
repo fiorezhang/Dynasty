@@ -8,7 +8,7 @@ class Map{
 		for (var i=0; i<size; i++){
 			this.data.cells[i] = new Array();
 			for (var j=0; j<size; j++){
-				this.data.cells[i][j] = {'ter':Terrain.none, 'resTp':ResType.none, 'resCt':ResCount.none, 'cBase':CityBase.none, 'cCult':CityCult.none, 'cId':CityId.none, 'pId':PeopleId.none, 'rdW':Rdcount.none, 'rdE':Rdcount.none, 'rdN':Rdcount.none, 'rdS':Rdcount.none};
+				this.data.cells[i][j] = {'ter':Terrain.none, 'resTp':ResType.none, 'resCt':ResCount.none, 'cBase':CityBase.none, 'cCult':CityCult.none, 'cId':CityId.none, 'pId':PeopleId.none, 'rdW':Rdcount.none, 'rdE':Rdcount.none, 'rdN':Rdcount.none, 'rdS':Rdcount.none, 'fog':FogLevel.max};
 			}
 		}
 	}
@@ -175,7 +175,7 @@ class Map{
 		//生成新城市
 		/* TODO:测试由城市生成新城市
 		if (glbData.dayMain >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {
-			var city = new City(CitySize.small, CityCult.none);
+			var city = new City(CitySize.small, CityCult.none, null);
 			if (city.data.id != CityId.none){	//成功生成
 				cityList.push(city);
 				this.data.dayCityNext = glbData.dayMain + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数

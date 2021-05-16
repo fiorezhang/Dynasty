@@ -162,6 +162,36 @@ function drawMapMode() {
 	}
 }
 
+function drawPlayMode() {
+	if (glbData.playMode == PlayMode.yes) {	
+		//当cell是指定城市文化以及市民一定范围内，没有雾
+		for (var i=0; i<glbData.mapCellSize; i++){
+			for (var j=0; j<glbData.mapCellSize; j++){				
+				if (mapMain.data.cells[i][j].cCult == glbData.playCityId || (mapMain.data.cells[i][j].pId != PeopleId.none && peopleList[mapMain.data.cells[i][j].pId].data.cCult == glbData.playCityId)) {
+					for (var k=Math.max(0, i-glbData.fogDistance); k<Math.min(glbData.mapCellSize, i+glbData.fogDistance+1); k++) {
+						for (var l=Math.max(0, j-glbData.fogDistance); l<Math.min(glbData.mapCellSize, j+glbData.fogDistance+1); l++) {
+							mapMain.data.cells[k][l].fog = FogLevel.none;
+						}
+					}
+				}
+			}
+		}		
+		//绘制雾
+		var cellSide = Math.round(windowSizeMap / glbData.mapCellSize); //边长
+		for (var i=0; i<glbData.mapCellSize; i++){
+			for (var j=0; j<glbData.mapCellSize; j++){
+				if (mapMain.data.cells[i][j].fog != FogLevel.none){
+					contextMap.fillStyle="rgba(192, 192, 192, " + mapMain.data.cells[i][j].fog/FogLevel.max + ")";
+					contextMap.fillRect(i*cellSide, j*cellSide, cellSide, cellSide);
+				}
+				if (mapMain.data.cells[i][j].fog != FogLevel.max) {
+					mapMain.data.cells[i][j].fog += 1;
+				}
+			}
+		}
+	}
+}
+
 //保存Canvas图片，连续多张
 function recordMap() {
 	if ((glbData.debug & Debug.recordMap) > 0 && glbData.dayMain % DayRecordMap == 0) {
@@ -183,9 +213,9 @@ function showHighlight() {
 			posX = peopleList[glbData.hltPeopleId].data.posX;
 			posY = peopleList[glbData.hltPeopleId].data.posY;
 		}
-		else if (cityList.length > 0 && glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cBase == CityBase.center){
-			posX = glbData.hltPoint.posX;
-			posY = glbData.hltPoint.posY;
+		else if (cityList.length > 0 && glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cBase == CityBase.center){
+			posX = glbData.hltCell.posX;
+			posY = glbData.hltCell.posY;
 			var city = cityList[glbData.hltCityId];
 			for (var i=0; i<city.data.pAliveList.length; i++) {
 				posPeopleX = peopleList[city.data.pAliveList[i]].data.posX;
@@ -206,8 +236,8 @@ function showHighlight() {
 			}
 		}
 		else{
-			posX = glbData.hltPoint.posX;
-			posY = glbData.hltPoint.posY;
+			posX = glbData.hltCell.posX;
+			posY = glbData.hltCell.posY;
 		}
 		contextMap.fillStyle="red";
 		contextMap.fillRect(posX*cellSide, posY*cellSide, cellSide, 1);
@@ -244,10 +274,10 @@ function showStatus() {
 		document.getElementById("age").innerHTML = "寿命： " + peopleList[glbData.hltPeopleId].data.age;
 		document.getElementById("revenue").innerHTML = "收益： " + (peopleList[glbData.hltPeopleId].data.resCombat + peopleList[glbData.hltPeopleId].data.resCollect + peopleList[glbData.hltPeopleId].data.resRecycle) + " / " + peopleList[glbData.hltPeopleId].data.resConsume;
 	}	
-	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cBase == CityBase.center){
-		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltPoint.posX.toString() + " " + glbData.hltPoint.posY.toString();
-		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].resCt;
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cCult].data.fmName:"-");
+	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cBase == CityBase.center){
+		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltCell.posX.toString() + " " + glbData.hltCell.posY.toString();
+		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].resCt;
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult].data.fmName:"-");
 		document.getElementById("cityname").innerHTML = "城市： " + cityList[glbData.hltCityId].data.cityName;
 		document.getElementById("citycult").innerHTML = "文化： " + cityList[glbData.hltCityId].data.fmName;
 		document.getElementById("store").innerHTML = "储备： " + cityList[glbData.hltCityId].data.resCt;
@@ -264,9 +294,9 @@ function showStatus() {
 		document.getElementById("revenue").innerHTML = "收益";
 	}		
 	else{
-		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltPoint.posX.toString() + " " + glbData.hltPoint.posY.toString();
-		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].resCt;	
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cCult].data.fmName:"-");
+		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltCell.posX.toString() + " " + glbData.hltCell.posY.toString();
+		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].resCt;	
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult].data.fmName:"-");
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("citycult").innerHTML = "文化";
 		document.getElementById("store").innerHTML = "储备";
@@ -309,7 +339,7 @@ function showTable() {
 		tab+="</tr>";
 		//----
 	}
-	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cBase == CityBase.center){
+	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cBase == CityBase.center){
 		var showMax = TableRowMax;	//最多显示多少行
 		for (var i=0; i<cityList.length && showMax>0; i++) {	
 			if (cityList[i] != null && cityList[i].data.cult == cityList[glbData.hltCityId].data.cult) {
@@ -329,7 +359,7 @@ function showTable() {
 			}
 		}
 	}
-	else if ((glbData.hltPoint.posX == 0 || glbData.hltPoint.posX == glbData.mapCellSize-1) && (glbData.hltPoint.posY == 0 || glbData.hltPoint.posY == glbData.mapCellSize-1)){
+	else if ((glbData.hltCell.posX == 0 || glbData.hltCell.posX == glbData.mapCellSize-1) && (glbData.hltCell.posY == 0 || glbData.hltCell.posY == glbData.mapCellSize-1)){
 		var showMax = TableRowMax;	//最多显示多少行
 		for (var i=0; i<cityList.length && showMax>0; i++) {	
 			if (cityList[i] != null && cityList[i].data.alive == CityAlive.yes) {
@@ -400,7 +430,7 @@ function showTable() {
 		tab+="</tr>";
 		//----
 	}
-	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cBase == CityBase.center){
+	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cBase == CityBase.center){
 		for (var i=0; i<Math.min(cityList[glbData.hltCityId].data.pAliveList.length, TableRowMax); i++) {
 			var people = peopleList[cityList[glbData.hltCityId].data.pAliveList[i]];
 			//----
@@ -418,7 +448,7 @@ function showTable() {
 			//----
 		}
 	}
-	else if ((glbData.hltPoint.posX == 0 || glbData.hltPoint.posX == glbData.mapCellSize-1) && (glbData.hltPoint.posY == 0 || glbData.hltPoint.posY == glbData.mapCellSize-1)){
+	else if ((glbData.hltCell.posX == 0 || glbData.hltCell.posX == glbData.mapCellSize-1) && (glbData.hltCell.posY == 0 || glbData.hltCell.posY == glbData.mapCellSize-1)){
 		for (var i=0; i<Math.min(glbData.pAliveList.length, TableRowMax); i++) {	
 			var people = peopleList[glbData.pAliveList[i]];
 			//----

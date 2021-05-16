@@ -17,11 +17,13 @@
 <div style="float:left;">
 <div id=console1>
 <b style="width:150px; height:50px; font-size:20px;">速度</b>
-<input type="text" id="speed" value="0.01" style="width:200px; height:40px; font-size:20px"></input>
+<input type="text" id="speed" value="0.01" style="width:100px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">尺寸</b>
-<input type="text" id="size" value="120" style="width:200px; height:40px; font-size:20px"></input>
+<input type="text" id="size" value="120" style="width:100px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">调试</b>
-<input type="text" id="debug" value="0" style="width:200px; height:40px; font-size:20px"></input>
+<input type="text" id="debug" value="0" style="width:100px; height:40px; font-size:20px"></input>
+<b style="width:150px; height:50px; font-size:20px;">游戏</b>
+<input type="text" id="play" value="0" style="width:100px; height:40px; font-size:20px"></input>
 </div>
 
 <div id=console1>
@@ -121,6 +123,13 @@ var Rdcount = {'none':0, 'decrease':1, 'increase':10, 'max':20};
 
 var Combatwin = {'no':0, 'yes':1};
 
+var PlayMode = {'no':0, 'yes':1};
+
+var FogLevel = {'none':0, 'max':100};
+
+var MouseButton = {'left':0, 'middle':1, 'right':2};
+var TargetSet = {'no':0, 'yes':1};
+
 var DayResReborn = 2;
 var DayRoad = 1;
 var DayPeople = 100;
@@ -154,12 +163,17 @@ var glbData = {	'debug':0,
 				'peopleNumCity':0,	//每个城市初始生成多少个人
 				'ageAverage':0,	//平均寿命
 				'foodCount':0, 	//野外总矿数
-				'hltPoint':{'posX':0, 'posY':0}, //鼠标焦点
+				'hltCell':{'posX':0, 'posY':0}, //鼠标高亮焦点
 				'hltPeopleId':PeopleId.none,
 				'hltCityId':CityId.none,
 				'excelCity':null,	//绘制表格时的句柄，每次新建实例前要销毁前一个实例
 				'excelPeople':null,
 				'bio':"",
+				'playMode':PlayMode.no,
+				'playCityId':CityId.none,
+				'fogDistance':3,
+				'tgtCell':{'posX':0, 'posY':0}, //鼠标目的焦点（游戏模式中，人为指定一个目标，例如人移动目标，或者建城目标等）
+				'tgtSet':TargetSet.no,	//当回合是否设定了目标焦点
 			};			
 
 //调试接口
@@ -167,6 +181,14 @@ glbData.debug = document.getElementById("debug").value;
 
 //单步循环间隔
 glbData.secondCycle = document.getElementById("speed").value;
+
+//是否在游玩模式（控制一个城市以及分城，其它城市信息在迷雾里）
+if (document.getElementById("play").value > 0) {
+	glbData.playMode = PlayMode.yes;
+}
+else {
+	glbData.playMode = PlayMode.no;
+}
 
 //根据自定义内容重绘画布
 var windowSizeMap = 1200;
@@ -210,7 +232,7 @@ function initNewMap(){
 	glbData.bio = "";
 
 	//高亮点归零
-	glbData.hltPoint = {"posX":0, "posY":0};
+	glbData.hltCell = {"posX":0, "posY":0};
 	glbData.hltPeopleId = PeopleId.none;
 	glbData.hltCityId = CityId.none; 
 
@@ -223,7 +245,7 @@ function initNewMap(){
 
 	//生成城市，以增量方式存放在list里面，list为了保证可索引必须唯一
 	for (var i=0; i<glbData.cityNum; i++){
-		var city = new City(CitySize.small, CityCult.none);
+		var city = new City(CitySize.small, CityCult.none, null);
 		if (city.data.id != CityId.none){
 			cityList.push(city);
 			//生成初始人口，以增量方式存放在list里面，所有的人口放在同一个list且list必须唯一
@@ -234,6 +256,12 @@ function initNewMap(){
 				}				
 			}
 		}
+	}
+	
+	if (glbData.playMode == PlayMode.yes) {
+		glbData.playCityId = getRandom(0, cityList.length);
+		glbData.hltCell = {"posX":cityList[glbData.playCityId].data.posX, "posY":cityList[glbData.playCityId].data.posY};
+		glbData.hltCityId = glbData.playCityId;
 	}
 	
 	//打印所有信息，可以关掉
@@ -248,6 +276,7 @@ function initNewMap(){
 	drawCells();	
 	showHighlight();
 	drawMapMode();
+	drawPlayMode();
 	recordMap();
 }
 
@@ -297,6 +326,19 @@ function updateAll(){
 function stepCa(){
 	glbData.debug = document.getElementById("debug").value;
 	glbData.secondCycle = document.getElementById("speed").value;
+	if (document.getElementById("play").value > 0) {
+		glbData.playMode = PlayMode.yes;
+	}
+	else {
+		glbData.playMode = PlayMode.no;
+	}
+
+	if (glbData.playMode == PlayMode.yes && (cityList[glbData.playCityId] == null || cityList[glbData.playCityId].data.alive == CityAlive.no)) {	//选中的城灭了之后，随机换一个
+		var newCityId = glbData.cAliveList[getRandom(0, glbData.cAliveList.length)];
+		glbData.playCityId  = cityList[newCityId].data.cult;	//不管是主城还是分城，得到主城的ID
+		glbData.hltCell = {"posX":cityList[glbData.playCityId].data.posX, "posY":cityList[glbData.playCityId].data.posY};
+		glbData.hltCityId = glbData.playCityId;
+	}
 	
 	if (glbData.secondCycle <= 0){
 		glbData.secondCycle = 1;
@@ -316,6 +358,7 @@ function stepCa(){
     drawCells();	//画格子
 	showHighlight();//高亮
 	drawMapMode();
+	drawPlayMode();
 	recordMap();
 	glbData.dayMain += 1;	//天数+1
 }
@@ -334,37 +377,52 @@ function autoCa(){
 //响应鼠标事件的函数，例如点击后显示当前格的有用信息等
 canavasMap.onmousedown = function(ev) {
 	var ev = ev || window.event;
-	
-	var rect = canavasMap.getBoundingClientRect();
-    var offsetX = ev.clientX - rect.left * (canavasMap.width / rect.width);
-	var offsetY = ev.clientY - rect.top * (canavasMap.height / rect.height);
 
-	
-	
+	var rect = canavasMap.getBoundingClientRect();
+	var offsetX = ev.clientX - rect.left * (canavasMap.width / rect.width);	//滚动状态也能准确获得坐标
+	var offsetY = ev.clientY - rect.top * (canavasMap.height / rect.height);	
 	//var offsetX = ev.clientX-canavasMap.offsetLeft;
 	//var offsetY = ev.clientY-canavasMap.offsetTop;
+	
 	var cellSide = Math.round(windowSizeMap / glbData.mapCellSize);
 	var posX = Math.floor(offsetX / cellSide);
 	var posY = Math.floor(offsetY / cellSide);
 	contextMap.moveTo(offsetX,offsetY);
-	
-	//探测到当前鼠标点下的posX,posY
-	glbData.hltPoint.posX = posX;
-	glbData.hltPoint.posY = posY;
-	glbData.hltPeopleId = mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].pId;
-	glbData.hltCityId = mapMain.data.cells[glbData.hltPoint.posX][glbData.hltPoint.posY].cId;
 
-	showStatus();
-	showTable();
-	drawCells();
-	showHighlight();
-	drawMapMode();
-	recordMap();
+	//左键事件响应
+	if (ev.button == MouseButton.left) {		
+		//探测到当前鼠标点下的posX,posY
+		glbData.hltCell.posX = posX;
+		glbData.hltCell.posY = posY;
+		glbData.hltPeopleId = mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].pId;
+		glbData.hltCityId = mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cId;
+
+		showStatus();
+		showTable();
+		drawCells();
+		showHighlight();
+		drawMapMode();
+		drawPlayMode();
+		recordMap();
+	}
+	else if (ev.button == MouseButton.right) {
+		glbData.tgtCell.posX = posX;
+		glbData.tgtCell.posY = posY;
+		glbData.tgtSet = TargetSet.yes;
+	}
 	
 	canavasMap.onmouseup = function(){
 		document.onmouseup = null;
 	};
 };
+
+//屏蔽浏览器自带的右键菜单
+canavasMap.oncontextmenu = function(event){
+    var event = event || window.event;
+    return false;
+};
+
+
 </script>
 
 </body>

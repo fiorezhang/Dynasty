@@ -1,8 +1,8 @@
 class City{
 	static idStatic = 0;
 	
-	constructor(size, culture){
-		this.data = {'posX':0, 'posY':0, 'alive':CityAlive.no, 'resCt':0, 'dayCityNext':DayCity, 'dayPeopleNext':DayPeople, 'citySize':0, 'id':CityId.none, 'cult':CityCult.none, 'fmName':'', 'cityName':'', 'territory':0, 'pAliveList':null, 'resCellList':null};
+	constructor(size, culture, target){
+		this.data = {'posX':0, 'posY':0, 'alive':CityAlive.no, 'resCt':0, 'dayCityNext':DayCity, 'dayPeopleNext':DayPeople, 'citySize':0, 'id':CityId.none, 'cult':CityCult.none, 'fmName':'', 'cityName':'', 'territory':0, 'pAliveList':null, 'resCellList':null, 'tgtCell':{'posX':-1, 'posY':-1},};
 		
 		if (size == CitySize.none){	//专门设计给读档
 			City.idStatic += 1;
@@ -15,6 +15,7 @@ class City{
 		var cityConflict = 0;
 		//var cityBoundary = CitySize.big + 1;	//城市和其它城市，湖泊，矿物等间隔一格
 		var cityBoundary = CitySize.big;	//城市和其它城市，湖泊，矿物等可以无间隔
+		var distanceTry = 0;	//指定城市位置时，以指定位置开始，从0开始扩大搜索范围
 		do{
 			cityConflict = 0;
 			this.data.posX = getRandom(0+cityBoundary, mapMain.data.cellSize-cityBoundary);
@@ -25,11 +26,19 @@ class City{
 				var cityMainId = culture;
 				var cityMain = cityList[cityMainId];
 				if (cityMain != null){
-					var distance = Math.ceil(Math.sqrt(cityMain.data.territory));
-					this.data.posX = getRandom(Math.max(0, cityMain.data.posX-distance)+cityBoundary, Math.min(mapMain.data.cellSize, cityMain.data.posX+distance)-cityBoundary);
-					this.data.posY = getRandom(Math.max(0, cityMain.data.posY-distance)+cityBoundary, Math.min(mapMain.data.cellSize, cityMain.data.posY+distance)-cityBoundary);
+					if (target != null && target.posX != -1 && target.posY != -1) {
+						this.data.posX = getRandom(Math.max(cityBoundary, target.posX-distanceTry), Math.min(mapMain.data.cellSize-cityBoundary, target.posX+distanceTry+1));
+						this.data.posY = getRandom(Math.max(cityBoundary, target.posY-distanceTry), Math.min(mapMain.data.cellSize-cityBoundary, target.posY+distanceTry+1));
+						distanceTry += 1;
+					}
+					else {
+						var distanceMax = Math.ceil(Math.sqrt(cityMain.data.territory));	//未指定城市位置时，从主城开始，限定最大搜索范围，随机产生位置
+						this.data.posX = getRandom(Math.max(0, cityMain.data.posX-distanceMax)+cityBoundary, Math.min(mapMain.data.cellSize, cityMain.data.posX+distanceMax+1)-cityBoundary);
+						this.data.posY = getRandom(Math.max(0, cityMain.data.posY-distanceMax)+cityBoundary, Math.min(mapMain.data.cellSize, cityMain.data.posY+distanceMax+1)-cityBoundary);
+					}	
 				}
 			}
+
 			
 			//console.log("RETRY", culture, this.data.posX, this.data.posY);
 
@@ -162,6 +171,16 @@ class City{
 		addBio("【"+this.data.fmName+"】家族【"+this.data.cityName+"】城消亡。")
 	}
 	
+	command(){
+		if (this.data.id == glbData.hltCityId && glbData.tgtSet == TargetSet.yes && ((glbData.playMode == PlayMode.no && this.data.id == this.data.cult) || (glbData.playMode == PlayMode.yes && this.data.id == glbData.playCityId))) {
+			this.data.tgtCell = {'posX':glbData.tgtCell.posX, 'posY':glbData.tgtCell.posY};
+			this.data.tgtSet = TargetSet.yes;
+			//console.log(this.data.tgtCell, this.data.tgtSet);
+			glbData.tgtSet = TargetSet.no;
+		}
+	}
+
+	
 	update(){
 		var peopleBorn = 0;	//标记是否本轮生成市民
 		//间隔一段时间，如果有足够资源，生成新的市民
@@ -176,25 +195,32 @@ class City{
 			}	
 		}
 		
+		this.command();
+		
 		//生成新分城市
 		var cityBorn = 0;	
 		//符合条件时，主城生成新的城市
 		if (this.data.id == this.data.cult && glbData.dayMain >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {	//主城
 			var city = null;
 			var cityBornResCt = CityResCt.none;
+			var tgtPosition = {'posX':-1, 'posY':-1};
+			if (this.data.tgtSet == TargetSet.yes) {
+				tgtPosition = {'posX':this.data.tgtCell.posX, 'posY':this.data.tgtCell.posY};
+			}
 			if (this.data.citySize == CitySize.middle && this.data.resCt > CityResCt.middle + CityResCt.small) { //中城而且资源足够，分城后不会立刻降级
 				cityBornResCt = CityResCt.small;
-				var city = new City(CitySize.small, this.data.cult);
+				var city = new City(CitySize.small, this.data.cult, tgtPosition);
 			}
 			else if (this.data.citySize == CitySize.big && this.data.resCt > CityResCt.big + CityResCt.middle) { //大城而且资源足够，分城后不会立刻降级
 				cityBornResCt = CityResCt.middle;
-				var city = new City(CitySize.middle, this.data.cult);
+				var city = new City(CitySize.middle, this.data.cult, tgtPosition);
 			}
 			if (city != null && city.data.id != CityId.none){	//成功生成
 				cityBorn = 1;
 				cityList.push(city);
 				this.data.resCt -= CityResCt.small;//主城减去分城的初始资源
 				this.data.dayCityNext = glbData.dayMain + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
+				this.data.tgtSet = TargetSet.no;
 			}
 			else {
 				this.data.dayCityNext = glbData.dayMain + getRandom(DayCityFail/2, DayCityFail*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数

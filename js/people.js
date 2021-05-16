@@ -13,6 +13,8 @@ class People{
 						'recycle':0, 
 						'consume':0,
 						'resCell':{'posX':-1, 'posY':-1},
+						'tgtCell':{'posX':-1, 'posY':-1},
+						'tgtSet':TargetSet.no,
 						'starve':PeopleStarve.no,
 						'pNearList':{'nrW':PeopleId.none, 'nrE':PeopleId.none, 'nrN':PeopleId.none, 'nrS':PeopleId.none}, 
 						'age':PeopleAge.none,
@@ -217,14 +219,31 @@ class People{
 		}
 	}
 
-	explore(){
-		//随机生成方向，来时的方向尽可能避免，权重值设为最小，走过的路尽量避免
-		var directWtWest = (this.data.direct==Direct.west)?(Rdcount.max*2):((this.data.direct==Direct.east)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdW));
-		var directWtEast = (this.data.direct==Direct.east)?(Rdcount.max*2):((this.data.direct==Direct.west)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdE));
-		var directWtNorth = (this.data.direct==Direct.north)?(Rdcount.max*2):((this.data.direct==Direct.south)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdN));
-		var directWtSouth = (this.data.direct==Direct.south)?(Rdcount.max*2):((this.data.direct==Direct.north)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdS));		
+	command(){
+		if (this.data.id == glbData.hltPeopleId && glbData.tgtSet == TargetSet.yes && (glbData.playMode == PlayMode.no || (glbData.playMode == PlayMode.yes && this.data.cCult == glbData.playCityId))) {
+			this.data.tgtCell = {'posX':glbData.tgtCell.posX, 'posY':glbData.tgtCell.posY};
+			this.data.tgtSet = TargetSet.yes;
+			//console.log(this.data.tgtCell, this.data.tgtSet);
+			glbData.tgtSet = TargetSet.no;
+		}
+	}
 
-		this.move(directWtWest, directWtEast, directWtNorth, directWtSouth);
+	explore(){
+		if (this.data.tgtSet == TargetSet.yes) {
+			this.go(this.data.tgtCell.posX, this.data.tgtCell.posY);
+			if (this.data.posX == this.data.tgtCell.posX && this.data.posY == this.data.tgtCell.posY) {
+				this.data.tgtSet = TargetSet.no;
+			}
+		}
+		else {
+			//随机生成方向，来时的方向尽可能避免，权重值设为最小，走过的路尽量避免
+			var directWtWest = (this.data.direct==Direct.west)?(Rdcount.max*2):((this.data.direct==Direct.east)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdW));
+			var directWtEast = (this.data.direct==Direct.east)?(Rdcount.max*2):((this.data.direct==Direct.west)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdE));
+			var directWtNorth = (this.data.direct==Direct.north)?(Rdcount.max*2):((this.data.direct==Direct.south)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdN));
+			var directWtSouth = (this.data.direct==Direct.south)?(Rdcount.max*2):((this.data.direct==Direct.north)?1:(Rdcount.max - mapMain.data.cells[this.data.posX][this.data.posY].rdS));		
+
+			this.move(directWtWest, directWtEast, directWtNorth, directWtSouth);
+		}
 	}
 	
 	go(posX, posY){
@@ -423,6 +442,8 @@ class People{
 		}
 		
 		this.upgrade();
+		
+		this.command();
 		
 		var acted = 0;	//本回合是否行动过（移动，战斗，挖矿，转移矿才算行动）
 		this.near();
