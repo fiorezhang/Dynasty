@@ -13,8 +13,8 @@ class City{
 		var countRetry = 0;		
 		var maxRetry = 100;
 		var cityConflict = 0;
-		var cityBoundary = CitySize.big + 1;
-		//var cityBoundary = CitySize.big;
+		//var cityBoundary = CitySize.big + 1;	//城市和其它城市，湖泊，矿物等间隔一格
+		var cityBoundary = CitySize.big;	//城市和其它城市，湖泊，矿物等可以无间隔
 		do{
 			cityConflict = 0;
 			this.data.posX = getRandom(0+cityBoundary, mapMain.data.cellSize-cityBoundary);

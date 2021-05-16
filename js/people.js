@@ -250,7 +250,7 @@ class People{
 		//仅当不在矿区的时候消耗食物，并且立刻回收一部分食物（不占用行动）
 		if (mapMain.data.cells[this.data.posX][this.data.posY].resTp != ResType.food) {
 			if (mapMain.data.cells[this.data.posX][this.data.posY].cCult == this.data.cCult) {	//在自己的疆域上
-				this.data.consume = Math.max(PeopleConsume.save, this.data.recycle);
+				this.data.consume = Math.ceil((PeopleConsume.max + this.data.recycle)/2); //(消耗-生产)比正常的减半
 			}
 			else {
 				this.data.consume = PeopleConsume.max;
@@ -491,7 +491,8 @@ class People{
 					}
 				}
 				else if (this.data.resCt < PeopleResCt.enough) {
-					if (mapMain.data.cells[this.data.posX][this.data.posY].resCt != ResCount.none){	//当前格有食物，直接开采
+					//if (mapMain.data.cells[this.data.posX][this.data.posY].resCt != ResCount.none){	//当前格有食物，直接开采
+					if (mapMain.data.cells[this.data.posX][this.data.posY].resCt >= (this.data.collect + ResCount.none)/2){	//当前格有超过半次采集量的食物，直接开采
 						this.collect();
 					}
 					else if (this.data.resCell.posX >=0 && this.data.resCell.posY >=0 && (this.data.resCell.posX != this.data.posX || this.data.resCell.posY != this.data.posY)) {	//当前格没有食物，向记忆中上一个有食物的格子移动

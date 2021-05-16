@@ -19,7 +19,7 @@
 <b style="width:150px; height:50px; font-size:20px;">速度</b>
 <input type="text" id="speed" value="0.01" style="width:200px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">尺寸</b>
-<input type="text" id="size" value="150" style="width:200px; height:40px; font-size:20px"></input>
+<input type="text" id="size" value="120" style="width:200px; height:40px; font-size:20px"></input>
 <b style="width:150px; height:50px; font-size:20px;">调试</b>
 <input type="text" id="debug" value="0" style="width:200px; height:40px; font-size:20px"></input>
 </div>
@@ -103,7 +103,7 @@ var CityBase = {'none':0, 'reserve':1, 'zone':2, 'center':3};
 var CityId = {'none':-1}; 
 var CityCult = {'none':-1};
 var CitySize = {'none':0, 'small':1, 'middle':2, 'big':3};
-var CityResCt = {'none':0, 'small':10000, 'middle':30000, 'big':90000};
+var CityResCt = {'none':0, 'small':10000, 'middle':90000, 'big':250000};
 
 var PeopleAlive = {'no':0, 'yes':1};
 var PeopleId = {'none':-1};
@@ -111,7 +111,7 @@ var PeopleResCt = {'none':0, 'dying':100, 'starve':500, 'standard':1000, 'enough
 var PeoplePower = {'none':0, 'min':1, 'max':10};
 var PeopleCollect = {'none':0, 'min':1, 'max':10};
 var PeopleRecycle = {'none':0, 'min':1, 'max':10};
-var PeopleConsume = {'none':0, 'min':1, 'save':9, 'max':10};
+var PeopleConsume = {'none':0, 'min':1, 'max':10};
 var PeopleStarve = {'no':0, 'yes':1};
 var PeopleAge = {'none':0, 'max':10000};
 
@@ -135,7 +135,7 @@ var PeopleNumIndex = 8;
 var MapWaterSeed = 0.42;
 var MapWaterLoop = 15;
 var MapResourceSeed = 0.44;
-var MapResourceLoop = 10;
+var MapResourceLoop = 8;
 
 var TableRowMax = 5000;
 
@@ -208,6 +208,11 @@ function initNewMap(){
 	
 	//传记归零
 	glbData.bio = "";
+
+	//高亮点归零
+	glbData.hltPoint = {"posX":0, "posY":0};
+	glbData.hltPeopleId = PeopleId.none;
+	glbData.hltCityId = CityId.none; 
 
 	//根据输入确定地图尺寸
 	glbData.mapCellSize = document.getElementById("size").value;

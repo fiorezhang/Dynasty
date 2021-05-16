@@ -329,7 +329,7 @@ function showTable() {
 			}
 		}
 	}
-	else {
+	else if ((glbData.hltPoint.posX == 0 || glbData.hltPoint.posX == glbData.mapCellSize-1) && (glbData.hltPoint.posY == 0 || glbData.hltPoint.posY == glbData.mapCellSize-1)){
 		var showMax = TableRowMax;	//最多显示多少行
 		for (var i=0; i<cityList.length && showMax>0; i++) {	
 			if (cityList[i] != null && cityList[i].data.alive == CityAlive.yes) {
@@ -418,7 +418,7 @@ function showTable() {
 			//----
 		}
 	}
-	else {
+	else if ((glbData.hltPoint.posX == 0 || glbData.hltPoint.posX == glbData.mapCellSize-1) && (glbData.hltPoint.posY == 0 || glbData.hltPoint.posY == glbData.mapCellSize-1)){
 		for (var i=0; i<Math.min(glbData.pAliveList.length, TableRowMax); i++) {	
 			var people = peopleList[glbData.pAliveList[i]];
 			//----
