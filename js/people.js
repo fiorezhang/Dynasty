@@ -500,7 +500,7 @@ class People{
 				}
 			}
 			else {	//当处于饥饿状态时
-				if (this.data.resCt < PeopleResCt.dying) {
+				if (this.data.resCt < PeopleResCt.dying) {	//快死了，第一优先级回家补充
 					if (Math.abs(this.data.posX - cityList[this.data.cId].data.posX) <= cityList[this.data.cId].data.citySize && Math.abs(this.data.posY - cityList[this.data.cId].data.posY) <= cityList[this.data.cId].data.citySize) {
 						var resDownload = Math.min(PeopleResCt.standard - this.data.resCt, cityList[this.data.cId].data.resCt);
 						this.data.resCt += resDownload;
@@ -511,12 +511,15 @@ class People{
 						this.go(cityList[this.data.cId].data.posX, cityList[this.data.cId].data.posY);
 					}
 				}
-				else if (this.data.resCt < PeopleResCt.enough) {
+				else if (this.data.tgtSet == TargetSet.yes) {	//饥饿但没死，第二优先级，响应命令
+					this.explore();
+				}
+				else if (this.data.resCt < PeopleResCt.enough) {	//饥饿但没死，也没命令，继续开采
 					//if (mapMain.data.cells[this.data.posX][this.data.posY].resCt != ResCount.none){	//当前格有食物，直接开采
-					if (mapMain.data.cells[this.data.posX][this.data.posY].resCt >= (this.data.collect + ResCount.none)/2){	//当前格有超过半次采集量的食物，直接开采
+					if (mapMain.data.cells[this.data.posX][this.data.posY].resCt >= this.data.collect){	//当前格有超过一定采集量的食物，直接开采
 						this.collect();
 					}
-					else if (this.data.resCell.posX >=0 && this.data.resCell.posY >=0 && (this.data.resCell.posX != this.data.posX || this.data.resCell.posY != this.data.posY)) {	//当前格没有食物，向记忆中上一个有食物的格子移动
+					else if (this.data.resCell.posX >=0 && this.data.resCell.posY >=0 && (Math.abs(this.data.resCell.posX - this.data.posX) + Math.abs(this.data.resCell.posY - this.data.posY)>0)) {	//当前格没有食物，向记忆中上一个有食物的格子移动
 						this.go(this.data.resCell.posX, this.data.resCell.posY);
 					}
 					else {	//记忆中的格子也没有食物，只能重新探索

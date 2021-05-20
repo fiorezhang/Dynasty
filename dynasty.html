@@ -98,7 +98,7 @@ var Debug = {'consoleLog':1, 'mapMode':2, 'recordMap':4};
 var Terrain = {'none':0, 'water':1};
 
 var ResType = {'none':0, 'food':1};
-var ResCount = {'none':0, 'reborn':1, 'max':20};
+var ResCount = {'none':0, 'reborn':5, 'max':20};
 
 var CityAlive = {'no':0, 'yes':1};
 var CityBase = {'none':0, 'reserve':1, 'zone':2, 'center':3};
@@ -130,7 +130,7 @@ var FogLevel = {'none':0, 'max':100};
 var MouseButton = {'left':0, 'middle':1, 'right':2};
 var TargetSet = {'no':0, 'yes':1};
 
-var DayResReborn = 2;
+var DayResReborn = 5;
 var DayRoad = 1;
 var DayPeople = 100;
 var DayPeopleUpgrade = 12;
@@ -159,7 +159,7 @@ var glbData = {	'debug':0,
 				'pAliveList':null, 
 				'combatMain':0, //战争计数器
 				'mapCellSize':10, 	//地图尺寸，N x N的方格地图
-				'cityNum':20, 	//初始生成多少个城市
+				'cityNum':10, 	//初始生成多少个城市
 				'peopleNumCity':0,	//每个城市初始生成多少个人
 				'ageAverage':0,	//平均寿命
 				'foodCount':0, 	//野外总矿数
@@ -415,6 +415,22 @@ canavasMap.onmousedown = function(ev) {
 		document.onmouseup = null;
 	};
 };
+
+canavasMap.onmouseover = function (ev) {
+	var ev = ev || window.event;
+
+	glbData.secondCycle = 1;
+	autoCa();	//停止并写入新的间隔
+	autoCa();	//重新开始
+}
+
+canavasMap.onmouseout = function (ev) {
+	var ev = ev || window.event;
+
+	glbData.secondCycle = document.getElementById("speed").value;
+	autoCa();	//停止并写入新的间隔
+	autoCa();	//重新开始
+}
 
 //屏蔽浏览器自带的右键菜单
 canavasMap.oncontextmenu = function(event){
