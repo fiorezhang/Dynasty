@@ -2,7 +2,7 @@ class City{
 	static idStatic = 0;
 	
 	constructor(size, culture, target){
-		this.data = {'posX':0, 'posY':0, 'alive':CityAlive.no, 'resCt':0, 'dayCityNext':DayCity, 'dayPeopleNext':DayPeople, 'citySize':0, 'id':CityId.none, 'cult':CityCult.none, 'fmName':'', 'cityName':'', 'territory':0, 'pAliveList':null, 'resCellList':null, 'tgtCell':{'posX':-1, 'posY':-1},};
+		this.data = {'posX':0, 'posY':0, 'alive':CityAlive.no, 'resCt':0, 'dayCityNext':DayCity, 'dayPeopleNext':DayPeople, 'citySize':0, 'id':CityId.none, 'cult':CityCult.none, 'main':CityMain.no, 'fmName':'', 'cityName':'', 'territory':0, 'pAliveList':null, 'resCellList':null, 'tgtCell':{'posX':-1, 'posY':-1},};
 		
 		if (size == CitySize.none){	//专门设计给读档
 			City.idStatic += 1;
@@ -23,13 +23,17 @@ class City{
 			
 			//限定新生成分城的位置
 			if (culture != CityCult.none && culture != null){
-				var cityMainId = culture;
+				this.data.cult = culture;
+				var cityMainId = this.getMainCityId();	
 				var cityMain = cityList[cityMainId];
 				if (cityMain != null){
 					if (target != null && target.posX != -1 && target.posY != -1) {
 						this.data.posX = getRandom(Math.max(cityBoundary, target.posX-distanceTry), Math.min(mapMain.data.cellSize-cityBoundary, target.posX+distanceTry+1));
 						this.data.posY = getRandom(Math.max(cityBoundary, target.posY-distanceTry), Math.min(mapMain.data.cellSize-cityBoundary, target.posY+distanceTry+1));
 						distanceTry += 1;
+						if (distanceTry > 2) {	//不要搜到太远距离
+							distanceTry = 2;
+						}
 					}
 					else {
 						var distanceMax = Math.ceil(Math.sqrt(cityMain.data.territory));	//未指定城市位置时，从主城开始，限定最大搜索范围，随机产生位置
@@ -38,8 +42,6 @@ class City{
 					}	
 				}
 			}
-
-			
 			//console.log("RETRY", culture, this.data.posX, this.data.posY);
 
 			for (var i=-cityBoundary; i<=cityBoundary; i++){
@@ -69,8 +71,9 @@ class City{
 		this.data.id = City.idStatic;
 		City.idStatic += 1;				
 		//console.log(this.data.id);		
-		if (culture == CityCult.none || culture == null) {
+		if (culture == CityCult.none || culture == null) {	//第一座城市，母城，初始主城
 			this.data.cult = this.data.id;
+			this.data.main = CityMain.yes;
 			var nameConflict = 0;
 			countRetry = 0;
 			maxRetry = 10;
@@ -89,7 +92,7 @@ class City{
 		}
 		else {
 			this.data.cult = culture;
-			var cityMainId = this.data.cult; //文化ID和主城ID相同
+			var cityMainId = this.data.cult; //文化ID和母城ID相同
 			var cityMain = cityList[cityMainId];
 			this.data.fmName = cityMain.data.fmName;
 		}
@@ -172,7 +175,7 @@ class City{
 	}
 	
 	command(){
-		if (this.data.id == glbData.hltCityId && glbData.tgtSet == TargetSet.yes && ((glbData.playMode == PlayMode.no && this.data.id == this.data.cult) || (glbData.playMode == PlayMode.yes && this.data.id == glbData.playCityId))) {
+		if (this.data.id == glbData.hltCityId && glbData.tgtSet == TargetSet.yes && ((glbData.playMode == PlayMode.no && this.data.main == CityMain.yes) || (glbData.playMode == PlayMode.yes && this.data.main == CityMain.yes && this.data.id == glbData.playCityId))) {
 			this.data.tgtCell = {'posX':glbData.tgtCell.posX, 'posY':glbData.tgtCell.posY};
 			this.data.tgtSet = TargetSet.yes;
 			//console.log(this.data.tgtCell, this.data.tgtSet);
@@ -180,6 +183,15 @@ class City{
 		}
 	}
 
+	getMainCityId() {
+		var cityMainId = CityId.none;
+		for (var i=0; i<glbData.cAliveList.length; i++) {
+			if (cityList[glbData.cAliveList[i]].data.cult == this.data.cult && cityList[glbData.cAliveList[i]].data.main == CityMain.yes) {
+				cityMainId = glbData.cAliveList[i];
+			}
+		}
+		return cityMainId;
+	}
 	
 	update(){
 		var peopleBorn = 0;	//标记是否本轮生成市民
@@ -200,12 +212,15 @@ class City{
 		//生成新分城市
 		var cityBorn = 0;	
 		//符合条件时，主城生成新的城市
-		if (this.data.id == this.data.cult && glbData.dayMain >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {	//主城
+		if (this.data.main == CityMain.yes && glbData.dayMain >= this.data.dayCityNext && glbData.cAliveList.length < CityNumMax) {	//主城
 			var city = null;
 			var cityBornResCt = CityResCt.none;
 			var tgtPosition = {'posX':-1, 'posY':-1};
 			if (this.data.tgtSet == TargetSet.yes) {
 				tgtPosition = {'posX':this.data.tgtCell.posX, 'posY':this.data.tgtCell.posY};
+				if (mapMain.data.cells[tgtPosition.posX][tgtPosition.posY].cBase > CityBase.none){ //指到别的城市上，就取消掉
+					tgtPosition = null;
+				}
 			}
 			if (this.data.citySize == CitySize.middle && this.data.resCt > CityResCt.middle + CityResCt.small) { //中城而且资源足够，分城后不会立刻降级
 				cityBornResCt = CityResCt.small;
@@ -218,7 +233,7 @@ class City{
 			if (city != null && city.data.id != CityId.none){	//成功生成
 				cityBorn = 1;
 				cityList.push(city);
-				this.data.resCt -= CityResCt.small;//主城减去分城的初始资源
+				this.data.resCt -= cityBornResCt;//主城减去分城的初始资源
 				this.data.dayCityNext = glbData.dayMain + getRandom(DayCity/2, DayCity*3/2);	//随机指定下一个生成市民的天数，平均值为设定的天数
 				this.data.tgtSet = TargetSet.no;
 			}
@@ -227,7 +242,7 @@ class City{
 			}
 			//console.log(this.data.id, this.data.dayCityNext);
 		}			
-		
+
 		//计算城市文化疆域
 		this.data.territory = 0;
 		for (var i=0; i<glbData.mapCellSize; i++){
@@ -239,7 +254,7 @@ class City{
 		}
 		
 		//分城如果比主城大，资源优先给主城
-		var cityMainId = this.data.cult;
+		var cityMainId = this.getMainCityId();
 		var cityMain = cityList[cityMainId];
 		if (this.data.citySize > cityMain.data.citySize) {
 			var resCtDelta = this.data.resCt - cityMain.data.resCt;
@@ -286,14 +301,31 @@ class City{
 			}
 			mapMain.data.cells[this.data.posX][this.data.posY].cBase = CityBase.center;
 		}
+
+		//主城迁都
+		if (this.data.tgtSet == TargetSet.yes && this.data.main == CityMain.yes && mapMain.data.cells[this.data.tgtCell.posX][this.data.tgtCell.posY].cBase == CityBase.center 
+			&& mapMain.data.cells[this.data.tgtCell.posX][this.data.tgtCell.posY].cCult == this.data.cult && mapMain.data.cells[this.data.tgtCell.posX][this.data.tgtCell.posY].cId != this.data.id) {
+			var thisCityId = this.data.id;																//交换城市ID
+			var tgtCityId = mapMain.data.cells[this.data.tgtCell.posX][this.data.tgtCell.posY].cId;
+			var tgtCity = cityList[tgtCityId];
+			this.data.main = CityMain.no;
+			tgtCity.data.main = CityMain.yes;
+			tgtCity.data.dayCityNext = this.data.dayCityNext;
+			
+			this.data.tgtSet = TargetSet.no;
+			
+			addBio("【"+this.data.fmName+"】家族【"+this.data.cityName+"】城迁都【"+tgtCity.data.cityName+"】城。");
+		}
+	
 		
 		//销毁城市
 		if (peopleBorn == 0 && cityBorn == 0 && this.data.resCt < PeopleResCt.starve && this.data.pAliveList.length == 0) {
 			//如果是主城，确保清除其它城以及文化
-			if (this.data.id == this.data.cult) {
+			if (this.data.main == CityMain.yes) {
+				var fmName = this.data.fmName; //缓存文化名
 				for (var i=0; i<cityList.length; i++) {
 					var city = cityList[i];
-					if (city != null && this.data.id == city.data.cult) {
+					if (city != null && this.data.cult == city.data.cult) {
 						city.dead();
 					}
 				}
@@ -305,6 +337,7 @@ class City{
 						}
 					}
 				}
+				addBio("【"+fmName+"】家族退出历史的舞台。")
 			}
 			else {
 				this.dead();

@@ -105,7 +105,8 @@ var CityBase = {'none':0, 'reserve':1, 'zone':2, 'center':3};
 var CityId = {'none':-1}; 
 var CityCult = {'none':-1};
 var CitySize = {'none':0, 'small':1, 'middle':2, 'big':3};
-var CityResCt = {'none':0, 'small':10000, 'middle':90000, 'big':250000};
+var CityResCt = {'none':0, 'small':10000, 'middle':40000, 'big':160000, 'max':640000};
+var CityMain = {'no':0, 'yes':1};
 
 var PeopleAlive = {'no':0, 'yes':1};
 var PeopleId = {'none':-1};
@@ -335,7 +336,7 @@ function stepCa(){
 
 	if (glbData.playMode == PlayMode.yes && (cityList[glbData.playCityId] == null || cityList[glbData.playCityId].data.alive == CityAlive.no)) {	//选中的城灭了之后，随机换一个
 		var newCityId = glbData.cAliveList[getRandom(0, glbData.cAliveList.length)];
-		glbData.playCityId  = cityList[newCityId].data.cult;	//不管是主城还是分城，得到主城的ID
+		glbData.playCityId  = cityList[newCityId].getMainCityId;	//不管是主城还是分城，得到主城的ID
 		glbData.hltCell = {"posX":cityList[glbData.playCityId].data.posX, "posY":cityList[glbData.playCityId].data.posY};
 		glbData.hltCityId = glbData.playCityId;
 	}

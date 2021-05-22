@@ -58,6 +58,13 @@ function getSeededRandomColor(m, n, seed){
 	return '#'+r.toString(16)+g.toString(16)+b.toString(16);
 }
 
+function getRatioColor(m, n, rRatio, gRatio, bRatio) {
+	var r = Math.floor(((m-n)*rRatio + n))&255;
+	var g = Math.floor(((m-n)*gRatio + n))&255;
+	var b = Math.floor(((m-n)*bRatio + n))&255;
+	return '#'+r.toString(16)+g.toString(16)+b.toString(16);
+}
+
 function unique(arr) {
   return Array.from(new Set(arr))
 }

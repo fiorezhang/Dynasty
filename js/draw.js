@@ -33,8 +33,19 @@ function drawCells(){
 				var city = cityList[mapMain.data.cells[i][j].cId];
 				contextMap.fillStyle=getSeededRandomColor(96,255,city.data.cult);
 				contextMap.fillRect(i*cellSide, j*cellSide, cellSide, cellSide);
-				contextMap.fillStyle=getSeededRandomColor(96,255,city.data.id);
-				contextMap.fillRect(i*cellSide+2, j*cellSide+2, cellSide-4, cellSide-4);	//城市其它格子，中心颜色代表ID
+				var cityResRatio = 0;
+				if (city.data.citySize == CitySize.small) {
+					cityResRatio = city.data.resCt / CityResCt.middle;
+				}
+				else if (city.data.citySize == CitySize.middle) {
+					cityResRatio = city.data.resCt / CityResCt.big;
+				}
+				else if (city.data.citySize == CitySize.big) {
+					cityResRatio = city.data.resCt / CityResCt.max;
+				}
+				cityResRatio = Math.min(cityResRatio, 1);
+				contextMap.fillStyle = getRatioColor(16,255,cityResRatio, cityResRatio, cityResRatio);
+				contextMap.fillRect(i*cellSide+cellSide/2-2, j*cellSide+cellSide/2-2, 4, 4);	//城市其它格子，中心颜色代表食物储备
 			}
 			if (mapMain.data.cells[i][j].cBase == CityBase.center){
 				var city = cityList[mapMain.data.cells[i][j].cId];
@@ -48,12 +59,12 @@ function drawCells(){
 			    //用中心颜色代表个人，周围代表部族
 				var people = peopleList[mapMain.data.cells[i][j].pId];
 				var city = cityList[people.data.cId];
-				var gradient = contextMap.createRadialGradient(vertexX, vertexY, Math.max(cellSide/8,1), vertexX, vertexY, cellSide/6);	//中心四分之一的城市颜色，到三分之一处是部族颜色
-				gradient.addColorStop(0, getSeededRandomColor(96,255,city.data.id));
+				var gradient = contextMap.createRadialGradient(vertexX, vertexY, cellSide/6, vertexX, vertexY, cellSide/4);	//中心四分之一的城市颜色，到三分之一处是部族颜色
+				gradient.addColorStop(0, getRatioColor(16,255, 1-people.data.power/PeoplePower.max, 1-people.data.collect/PeopleCollect.max, 1-people.data.recycle/PeopleRecycle.max));
 				gradient.addColorStop(1, getSeededRandomColor(96,255,city.data.cult));
 				contextMap.fillStyle = gradient;
 				contextMap.beginPath();
-				contextMap.arc(vertexX, vertexY, cellSide/2-1, 0, 2*Math.PI);
+				contextMap.arc(vertexX, vertexY, cellSide/2, 0, 2*Math.PI);
 				contextMap.fill();
 			}			
 			//绘制文化
@@ -144,7 +155,7 @@ function drawMapMode() {
 		}
 		for (var i=0; i<cityList.length; i++) {
 			var city = cityList[i];
-			if (city != null && city.data.id == city.data.cult) {	//主城
+			if (city != null && city.data.main == CityMain.yes) {	//主城
 				contextMap.font="75px KaiTi";
 				contextMap.textAlign="center";
 				contextMap.textBaseline="middle";

@@ -478,6 +478,7 @@ class People{
 						var resUpload = this.data.resCt - PeopleResCt.standard;
 						this.data.resCt -= resUpload;
 						cityList[this.data.cId].data.resCt += resUpload;
+						cityList[this.data.cId].data.resCt = Math.min(cityList[this.data.cId].data.resCt, CityResCt.max);
 						//保存采集位置到城市list里
 						if (this.data.resCell.posX != -1 && this.data.resCell.posY != -1) {
 							var resCellList = cityList[this.data.cId].data.resCellList;
