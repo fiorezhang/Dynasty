@@ -59,9 +59,9 @@ function getSeededRandomColor(m, n, seed){
 }
 
 function getRatioColor(m, n, rRatio, gRatio, bRatio) {
-	var r = Math.floor(((m-n)*rRatio + n))&255;
-	var g = Math.floor(((m-n)*gRatio + n))&255;
-	var b = Math.floor(((m-n)*bRatio + n))&255;
+	var r = Math.floor(((n-m)*rRatio + m))&255;
+	var g = Math.floor(((n-m)*gRatio + m))&255;
+	var b = Math.floor(((n-m)*bRatio + m))&255;
 	return '#'+r.toString(16)+g.toString(16)+b.toString(16);
 }
 

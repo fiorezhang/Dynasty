@@ -60,7 +60,7 @@ function drawCells(){
 				var people = peopleList[mapMain.data.cells[i][j].pId];
 				var city = cityList[people.data.cId];
 				var gradient = contextMap.createRadialGradient(vertexX, vertexY, cellSide/6, vertexX, vertexY, cellSide/4);	//中心四分之一的城市颜色，到三分之一处是部族颜色
-				gradient.addColorStop(0, getRatioColor(16,255, 1-people.data.power/PeoplePower.max, 1-people.data.collect/PeopleCollect.max, 1-people.data.recycle/PeopleRecycle.max));
+				gradient.addColorStop(0, getRatioColor(16,255, people.data.power/PeoplePower.max, people.data.collect/PeopleCollect.max, people.data.recycle/PeopleRecycle.max));
 				gradient.addColorStop(1, getSeededRandomColor(96,255,city.data.cult));
 				contextMap.fillStyle = gradient;
 				contextMap.beginPath();
@@ -262,6 +262,7 @@ function showHighlight() {
 function showStatus() {
 	document.getElementById("peoplecnt").innerHTML = "人数： " + peopleList.length + ' / ' + glbData.pAliveList.length;
 	document.getElementById("citycnt").innerHTML = "城数： " + cityList.length + ' / ' + glbData.cAliveList.length;
+	document.getElementById("familycnt").innerHTML = "家数： " + glbData.familyCount;
 	document.getElementById("day").innerHTML = "天数： " + glbData.dayMain;
 	document.getElementById("ageavg").innerHTML = "均寿： " + glbData.ageAverage;
 	document.getElementById("combat").innerHTML = "战争： " + glbData.combatMain;

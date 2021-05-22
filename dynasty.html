@@ -39,6 +39,7 @@
 <b id="day" style="width:150px; height:50px; font-size:20px;">天数</b><br>
 <b id="peoplecnt" style="width:150px; height:50px; font-size:20px;">人数</b><br>
 <b id="citycnt" style="width:150px; height:50px; font-size:20px;">城数</b><br>
+<b id="familycnt" style="width:150px; height:50px; font-size:20px;">家数</b><br>
 <b id="foodcnt" style="width:150px; height:50px; font-size:20px;">野矿</b><br>
 <b id="combat" style="width:150px; height:50px; font-size:20px;">战争</b><br>
 <b id="ageavg" style="width:150px; height:50px; font-size:20px;">均寿</b><br>
@@ -164,6 +165,7 @@ var glbData = {	'debug':0,
 				'peopleNumCity':0,	//每个城市初始生成多少个人
 				'ageAverage':0,	//平均寿命
 				'foodCount':0, 	//野外总矿数
+				'familyCount':0, //家族总数
 				'hltCell':{'posX':0, 'posY':0}, //鼠标高亮焦点
 				'hltPeopleId':PeopleId.none,
 				'hltCityId':CityId.none,
@@ -320,6 +322,12 @@ function updateAll(){
 		glbData.ageAverage = Math.floor(ageSum / glbData.pAliveList.length);
 	}
 	
+	glbData.familyCount = 0;
+	for (var i=0; i<glbData.cAliveList.length; i++) {
+		if (cityList[glbData.cAliveList[i]].data.main == CityMain.yes) {
+			glbData.familyCount += 1;
+		}
+	}
 }
 
 
