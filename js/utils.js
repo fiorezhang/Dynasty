@@ -69,6 +69,16 @@ function unique(arr) {
   return Array.from(new Set(arr))
 }
 
+function getMainCityId(cult) {
+	var cityMainId = CityId.none;
+	for (var i=0; i<glbData.cAliveList.length; i++) {
+		if (cityList[glbData.cAliveList[i]].data.cult == cult && cityList[glbData.cAliveList[i]].data.main == CityMain.yes) {
+			cityMainId = glbData.cAliveList[i];
+		}
+	}
+	return cityMainId;
+}
+
 //存档
 function save(){
 	var savedgame = {

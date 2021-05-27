@@ -69,7 +69,7 @@ function drawCells(){
 			}			
 			//绘制文化
 			if (mapMain.data.cells[i][j].cCult != CityCult.none){
-				var city = cityList[mapMain.data.cells[i][j].cCult];
+				var city = cityList[getMainCityId(mapMain.data.cells[i][j].cCult)];
 				contextMap.fillStyle=getSeededRandomColor(96,255,city.data.cult);
 				if (i>=1 && mapMain.data.cells[i][j].cCult != mapMain.data.cells[i-1][j].cCult){
 					contextMap.fillRect(i*cellSide, (j+1/4)*cellSide, 1, cellSide/2);
@@ -270,7 +270,7 @@ function showStatus() {
 	if (glbData.hltPeopleId != PeopleId.none && peopleList[glbData.hltPeopleId] != null){
 		document.getElementById("coord").innerHTML = "坐标： " + peopleList[glbData.hltPeopleId].data.posX + " , " + peopleList[glbData.hltPeopleId].data.posY;
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].resCt;	
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult != CityCult.none?cityList[mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult].data.fmName:"-");	
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult != CityCult.none?cityList[getMainCityId(mapMain.data.cells[peopleList[glbData.hltPeopleId].data.posX][peopleList[glbData.hltPeopleId].data.posY].cCult)].data.fmName:"-");	
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("citycult").innerHTML = "文化";
 		document.getElementById("store").innerHTML = "储备";
@@ -289,7 +289,7 @@ function showStatus() {
 	else if (glbData.hltCityId != CityId.none && cityList[glbData.hltCityId] != null && mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cBase == CityBase.center){
 		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltCell.posX.toString() + " " + glbData.hltCell.posY.toString();
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].resCt;
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult].data.fmName:"-");
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult != CityCult.none?cityList[getMainCityId(mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult)].data.fmName:"-");
 		document.getElementById("cityname").innerHTML = "城市： " + cityList[glbData.hltCityId].data.cityName;
 		document.getElementById("citycult").innerHTML = "文化： " + cityList[glbData.hltCityId].data.fmName;
 		document.getElementById("store").innerHTML = "储备： " + cityList[glbData.hltCityId].data.resCt;
@@ -308,7 +308,7 @@ function showStatus() {
 	else{
 		document.getElementById("coord").innerHTML = "坐标： " + glbData.hltCell.posX.toString() + " " + glbData.hltCell.posY.toString();
 		document.getElementById("food").innerHTML = "矿藏： " + mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].resCt;	
-		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult != CityCult.none?cityList[mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult].data.fmName:"-");
+		document.getElementById("culture").innerHTML = "文化： " + (mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult != CityCult.none?cityList[getMainCityId(mapMain.data.cells[glbData.hltCell.posX][glbData.hltCell.posY].cCult)].data.fmName:"-");
 		document.getElementById("cityname").innerHTML = "城市";
 		document.getElementById("citycult").innerHTML = "文化";
 		document.getElementById("store").innerHTML = "储备";

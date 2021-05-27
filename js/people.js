@@ -165,7 +165,7 @@ class People{
 				//console.log("water or people");
 			}
 			else if (mapMain.data.cells[temp.posX][temp.posY].cId > CityId.none){
-				if (mapMain.data.cells[temp.posX][temp.posY].cId != this.data.cId){	//当碰撞检测到别的城市时
+				if (mapMain.data.cells[temp.posX][temp.posY].cCult != this.data.cCult){	//当碰撞检测到别的城市时
 					moveConflict = 1;
 					//console.log("other city");
 				}
