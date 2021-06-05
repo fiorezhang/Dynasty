@@ -92,7 +92,7 @@ class City{
 		}
 		else {
 			this.data.cult = culture;
-			var cityMainId = this.data.cult; //文化ID和母城ID相同
+			var cityMainId = getMainCityId(this.data.cult); //文化ID和母城ID相同
 			var cityMain = cityList[cityMainId];
 			this.data.fmName = cityMain.data.fmName;
 		}

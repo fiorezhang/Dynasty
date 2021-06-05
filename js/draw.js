@@ -134,7 +134,7 @@ function drawMapMode() {
 		for (var i=0; i<glbData.mapCellSize; i++){
 			for (var j=0; j<glbData.mapCellSize; j++){				
 				if (mapMain.data.cells[i][j].cCult != CityCult.none){
-					var city = cityList[mapMain.data.cells[i][j].cCult];
+					var city = cityList[getMainCityId(mapMain.data.cells[i][j].cCult)];
 					contextMap.fillStyle=getSeededRandomColor(96,255,city.data.cult);
 					contextMap.fillRect(i*cellSide+1, j*cellSide+1, cellSide-2, cellSide-2);
 					contextMap.fillStyle="black";
